@@ -1,0 +1,232 @@
+/* Arquivo: style.css (VERSÃO 4.1 - Adiciona Guia de Comandos) */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+    /* Paleta de Cores (Baseada no Instagram @codigokidcachoeirinha) */
+    --primary-color: #9634F9;   /* Roxo principal */
+    --secondary-color: #1a1a1a; /* Fundo da sidebar */
+    --bg-color: #121212;        /* Fundo do chat (preto/cinza escuro) */
+    --text-color: #FFFFFF;      /* Texto principal (branco) */
+    --bot-bg: #2a2a2a;         /* Fundo da bolha do bot */
+    --user-bg: var(--primary-color); /* Fundo da bolha do usuário */
+    --border-color: #333;
+    --highlight-color: #FDD835; /* Amarelo do logo para destacar */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex; 
+    height: 100vh; 
+    margin: 0;
+    overflow: hidden; 
+}
+
+/* --- BARRA LATERAL (ATUALIZADA) --- */
+.sidebar {
+    width: 400px; /* Um pouco mais de espaço para os comandos */
+    flex-shrink: 0; 
+    background-color: var(--secondary-color);
+    padding: 24px;
+    border-right: 1px solid var(--border-color);
+    height: 100vh;
+    overflow-y: auto; /* Permite rolar a barra lateral se os comandos forem muitos */
+}
+
+.sidebar h2 {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 1.25rem;
+    margin-bottom: 30px; /* Espaço abaixo do título principal */
+}
+
+/* --- ESTILOS DO GUIA DE COMANDOS (NOVO) --- */
+.command-guide {
+    margin-top: 20px;
+}
+
+.command-guide h4 {
+    color: #aaa; /* Um cinza claro, menos importante */
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.guide-title {
+    color: #ccc;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.command-list {
+    list-style: none; /* Remove as bolinhas */
+    padding-left: 0;
+}
+
+.command-list li {
+    margin-bottom: 15px; /* "separado por linha" com espaço */
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.command-list code {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #252525; /* Fundo escuro para o código */
+    color: var(--highlight-color); /* Amarelo da paleta do Instagram */
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: inline-block; 
+    width: 100%; /* Faz o <code> ocupar a linha toda */
+    white-space: pre-wrap; /* Permite que o comando longo quebre a linha */
+    word-break: break-all;
+}
+/* --- FIM DO GUIA DE COMANDOS --- */
+
+
+/* --- CONTAINER DO CHAT (Não muda) --- */
+.chat-container {
+    flex-grow: 1; 
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+}
+
+.chat-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--primary-color);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.chat-header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scroll-behavior: smooth;
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto;   
+    padding: 20px;
+}
+
+.message {
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 75%;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.message p {
+    margin: 0;
+    white-space: pre-wrap; 
+}
+
+.bot-message {
+    background-color: var(--bot-bg);
+    color: var(--text-color);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.user-message {
+    background-color: var(--user-bg);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+.chat-input-form {
+    background-color: var(--bg-color); 
+    border-top: 1px solid var(--border-color); 
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto;   
+    padding: 20px;
+}
+
+#chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+#message-input {
+    flex-grow: 1;
+    background-color: var(--bot-bg); 
+    color: var(--text-color); 
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+#message-input::placeholder {
+    color: #888;
+}
+
+#message-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(150, 52, 249, 0.5); 
+}
+
+#send-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+#send-button:hover {
+    background-color: #7a29c7; 
+}
+
+/* --- Adicionar este trecho no FINAL do style.css --- */
+
+.guide-tip {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 15px;
+}

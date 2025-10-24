@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente dos Alunos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <aside class="sidebar">
+        <h2>Equipe Código Kid</h2>
+
+        <div class="command-guide">
+            <h4>Exemplos de Comandos:</h4>
+            <p class="guide-tip">(Dica: os colchetes [ ] são opcionais!)</p>
+            
+            <p class="guide-title">Consultar</p>
+            <ul class="command-list">
+                <li><code>Quem está atrasado?</code></li>
+                <li><code>Quem finaliza essa semana?</code></li>
+                <li><code>Quem finaliza nos próximos 30 dias?</code></li>
+                <li><code>Quem finaliza em novembro?</code></li>
+                <li><code>Quem finaliza no dia 04/10/2026?</code></li>
+            </ul>
+
+            <p class="guide-title">Adicionar / Atualizar</p>
+            <ul class="command-list">
+                <li><code>Adicionar aluno [Nome] no curso [Curso] com inicio [dd/mm/aaaa]</code></li>
+                <li><code>Adicionar observação [Texto] para o aluno [Nome]</code></li>
+                <li><code>Atualizar data do aluno [Nome] para [dd/mm/aaaa]</code></li>
+            </ul>
+
+            <p class="guide-title">Remover</p>
+            <ul class="command-list">
+                <li><code>Remover aluno [Nome]</code></li>
+            </ul>
+        </div>
+        </aside>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <h1>Assistente dos Alunos</h1>
+        </header>
+        
+        <main class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                <p>Olá! Como posso ajudar? Use os exemplos de comandos ao lado para começar.</p>
+            </div>
+        </main>
+        
+        <footer class="chat-input-form">
+            <form id="chat-form">
+                <input type="text" id="message-input" placeholder="Digite sua mensagem..." autocomplete="off" required>
+                <button type="submit" id="send-button" aria-label="Enviar">➤</button>
+            </form>
+        </footer>
+    </div>
+
+    <script src="config.js"></script> 
+    <script src="script.js"></script>
+</body>
+</html>
