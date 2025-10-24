@@ -1,4 +1,4 @@
-// Arquivo: script.js (VERSÃO FINAL 6.0 - Calcula Previsão Automaticamente)
+// Arquivo: script.js (VERSÃO FINAL 6.6 - Limpeza de caracteres)
 
 // --- Elementos do DOM ---
 const chatMessages = document.getElementById('chat-messages');
@@ -39,6 +39,7 @@ async function handleSubmit(e) {
 function displayMessage(message, sender) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${sender}-message`;
+    // Converte quebras de linha \n em tags <br> para exibição no HTML
     message = message.replace(/\n/g, '<br>');
     messageElement.innerHTML = `<p>${message}</p>`;
     chatMessages.appendChild(messageElement);
@@ -48,60 +49,57 @@ function displayMessage(message, sender) {
 
 /**
  * Interpreta a mensagem do usuário e decide qual ação tomar (GET ou POST).
- * (VERSÃO 6.4 - ORDEM CORRIGIDA E REGEX FLEXÍVEIS)
+ * (VERSÃO 6.6 - Baseada na 6.5, mas limpa)
  */
 async function processUserMessage(message) {
     const lowerMessage = message.toLowerCase();
     let match;
 
     // --- AÇÕES DE ESCRITA (POST) ---
-    // (Mantendo as versões flexíveis)
 
     // 1. ADICIONAR ALUNO (FLEXÍVEL)
-    match = lowerMessage.match(/(adicionar|cadastrar|novo) aluna? \[?(.*?)\]? (no )?curso \[?(.*?)\]? (com |em )?inicio( em)? \[?(\d{2}\/\d{2}\/\d{4})\]?/i);
+    match = lowerMessage.match(/(adicionar|cadastrar|novo) alun(a|o)? \[?(.*?)\]? (no )?curso \[?(.*?)\]? (com |em )?inicio( em)? \[?(\d{2}\/\d{2}\/\d{4})\]?/i);
     if (match) {
-        const [, , nome, , curso, , , dataInicio] = match;
-        console.log("DEBUG: Enviando para adicionar (FLEX):", { action: 'adicionar', nome: nome.trim(), curso: curso.trim(), dataInicio: dataInicio.trim() });
+        const [, , , nome, , curso, , , dataInicio] = match;
+        console.log("DEBUG: Enviando para adicionar (v6.6):", { action: 'adicionar', nome: nome.trim(), curso: curso.trim(), dataInicio: dataInicio.trim() });
         return await sendDataToAPI({ action: 'adicionar', nome: nome.trim(), curso: curso.trim(), dataInicio: dataInicio.trim() });
     }
 
     // 2. ADICIONAR OBSERVAÇÃO (FLEXÍVEL)
-    match = lowerMessage.match(/(adicionar|nova) (observação|obs|anotação) \[?(.+?)\]? (para|do|no) aluna? \[?(.+?)\]?$/i);
+    match = lowerMessage.match(/(adicionar|nova) (observação|obs|anotação) \[?(.+?)\]? (para|do|no) alun(a|o)? \[?(.+?)\]?$/i);
     if (match) {
-        const [, , , obs, , nome] = match;
-        console.log("DEBUG: Enviando para atualizar_obs (FLEX):", { action: 'atualizar_obs', nome: nome.trim(), obs: obs.trim() });
+        const [, , , obs, , , nome] = match;
+        console.log("DEBUG: Enviando para atualizar_obs (v6.6):", { action: 'atualizar_obs', nome: nome.trim(), obs: obs.trim() });
         return await sendDataToAPI({ action: 'atualizar_obs', nome: nome.trim(), obs: obs.trim() });
     }
 
     // 3. ATUALIZAR DATA (FLEXÍVEL)
-    match = lowerMessage.match(/(atualizar|mudar) (a )?data d(o|a) aluna? \[?(.*?)\]? para \[?(\d{2}\/\d{2}\/\d{4})\]?/i);
+    match = lowerMessage.match(/(atualizar|mudar) (a )?data d(o|a) alun(a|o)? \[?(.*?)\]? para \[?(\d{2}\/\d{2}\/\d{4})\]?/i);
     if (match) {
-        const [, , , , nome, novaData] = match;
-        console.log("DEBUG: Enviando para atualizar_data (FLEX):", { action: 'atualizar_data', nome: nome.trim(), novaData: novaData.trim() });
+        const [, , , , , nome, novaData] = match;
+        console.log("DEBUG: Enviando para atualizar_data (v6.6):", { action: 'atualizar_data', nome: nome.trim(), novaData: novaData.trim() });
         return await sendDataToAPI({ action: 'atualizar_data', nome: nome.trim(), novaData: novaData.trim() });
     }
 
     // 4. REMOVER ALUNO (FLEXÍVEL)
-    match = lowerMessage.match(/(remover|excluir|deletar) aluna? \[?(.*?)\]?/i);
+    match = lowerMessage.match(/(remover|excluir|deletar) alun(a|o)? \[?(.*?)\]?/i);
     if (match) {
-        const [, , nome] = match;
-        console.log("DEBUG: Enviando para remover (FLEX):", { action: 'remover', nome: nome.trim() });
+        const [, , , nome] = match;
+        console.log("DEBUG: Enviando para remover (v6.6):", { action: 'remover', nome: nome.trim() });
         return await sendDataToAPI({ action: 'remover', nome: nome.trim() });
     }
 
 
     // --- AÇÕES DE CONSULTA (GET) ---
-    // *** IMPORTANTE: A ORDEM FOI REVISADA ***
-    // Colocamos os filtros mais específicos PRIMEIRO para evitar conflitos.
 
-    // 5. CONSULTA: DATA ESPECÍFICA (Ex: "no dia 10/10/2025")
+    // 5. CONSULTA: DATA ESPECÍFICA 
     match = lowerMessage.match(/no dia (\d{2}\/\d{2}\/\d{4})|para a data de (\d{2}\/\d{2}\/\d{4})/);
     if (match) {
         const dataBusca = match[1] || match[2];
         return await getDataFromAPI('data_especifica', { data: dataBusca });
     }
 
-    // 6. CONSULTA: PRÓXIMOS [N] DIAS (Ex: "próximos 30 dias")
+    // 6. CONSULTA: PRÓXIMOS [N] DIAS 
     match = lowerMessage.match(/próximos (\d+) dias/);
     if (match) {
         return await getDataFromAPI('proximos_dias', { dias: match[1] });
@@ -122,8 +120,7 @@ async function processUserMessage(message) {
         return await getDataFromAPI('ano_que_vem');
     }
 
-    // 10. CONSULTA: MÊS ESPECÍFICO (Ex: "em novembro")
-    // Deve vir *depois* de "mês que vem"
+    // 10. CONSULTA: MÊS ESPECÍFICO 
     match = lowerMessage.match(/em (janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)/);
     if (match) {
         return await getDataFromAPI('mes', { mes: match[1] });
@@ -134,28 +131,27 @@ async function processUserMessage(message) {
         return await getDataFromAPI('atrasado');
     }
 
-    // --- Consultas mais genéricas (VÊM POR ÚLTIMO) ---
-
-    // 12. CONSULTA POR ANO DE CONCLUSÃO (FLEXÍVEL - CORRIGIDO)
-    // Ex: "Quem finaliza em 2027?", "alunos de 2025", "ano 2026"
-    // Esta é a regex que CORRIGE o seu print.
+    // 12. CONSULTA POR ANO DE CONCLUSÃO 
     match = lowerMessage.match(/(quem|aluno|conclusão|finaliza|termina|ano).*?(\d{4})/);
     if (match) {
-        // A palavra "dias" já foi tratada no filtro 6,
-        // então "próximos 2027 dias" não será capturado aqui.
-        const anoBusca = match[2]; // O ano é o segundo grupo
+        const anoBusca = match[2];
         return await getDataFromAPI('ano_conclusao', { ano: anoBusca });
     }
 
     // 13. CONSULTA POR NOME (MAIS VARIAÇÕES)
-    // Este é o mais genérico, deve vir por último.
     match = message.match(/(aluno|nome|buscar|consultar|existe) (\S+)|temos algum aluno (com o nome|chamado) (\S+)|(\S+)\??/i);
     if (match) {
         let nomeBusca = match[2] || match[4] || match[5];
         if (nomeBusca) {
-            nomeBusca = nomeBusca.replace('?', ''); // Limpa o '?'
-            // Lista de palavras-chave que NÃO são nomes (para evitar falsos positivos)
-            const stopWords = ['atrasado', 'semana', 'mes', 'dia', 'ajuda', 'oi', 'ola', 'bom', 'boa', 'tarde', 'noite', 'quem', 'qual', 'quais'];
+            nomeBusca = nomeBusca.replace('?', ''); // Limpa o '?' se houver
+
+            // Adiciona palavras de comando para evitar que elas virem buscas de nome
+            const stopWords = [
+                'atrasado', 'semana', 'mes', 'dia', 'ajuda', 'oi', 'ola', 'bom', 'boa', 'tarde', 'noite',
+                'quem', 'qual', 'quais', 'remover', 'adicionar', 'atualizar', 'excluir', 'deletar',
+                'cadastrar', 'novo', 'mudar'
+            ];
+
             if (!stopWords.includes(nomeBusca.toLowerCase())) {
                 return await getDataFromAPI('nome_aluno', { nome: nomeBusca.trim() });
             }
@@ -170,6 +166,7 @@ async function processUserMessage(message) {
  * Função para ENVIAR dados (POST) para o Google Apps Script (COM WORKAROUND CORS)
  */
 async function sendDataToAPI(data) {
+    // Esta função depende da variável 'API_URL' definida no seu arquivo HTML
     const response = await fetch(API_URL, {
         method: 'POST',
         mode: 'cors',
@@ -186,6 +183,7 @@ async function sendDataToAPI(data) {
         const result = JSON.parse(responseText);
         if (result.status === 'success') {
             return result.message;
+            // O 'S' ALEATÓRIO FOI REMOVIDO DAQUI
         } else {
             throw new Error(result.message || "Erro desconhecido retornado pela API.");
         }
@@ -200,7 +198,7 @@ async function sendDataToAPI(data) {
  * Função para BUSCAR dados (GET) do Google Apps Script
  */
 async function getDataFromAPI(filtro, params = {}) {
-    // ... (código getDataFromAPI continua igual) ...
+    // Esta função depende da variável 'API_URL' definida no seu arquivo HTML
     const url = new URL(API_URL);
     url.searchParams.append('action', 'consultar');
     url.searchParams.append('filtro', filtro);
@@ -214,6 +212,7 @@ async function getDataFromAPI(filtro, params = {}) {
         mode: 'cors',
     });
     const result = await response.json();
+    // O 'JSON' ALEATÓRIO FOI REMOVIDO DAQUI
     if (result.status === 'success') {
         return result.data;
     } else {
