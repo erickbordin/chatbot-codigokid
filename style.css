@@ -36,7 +36,7 @@ body {
 
 /* --- BARRA LATERAL (ATUALIZADA) --- */
 .sidebar {
-    width: 400px; /* Um pouco mais de espaço para os comandos */
+    width: 420px; /* Um pouco mais de espaço para os comandos */
     flex-shrink: 0; 
     background-color: var(--secondary-color);
     padding: 24px;
@@ -229,4 +229,5 @@ body {
     color: #888;
     font-style: italic;
     margin-bottom: 15px;
+
 }
