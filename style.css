@@ -1,7 +1,4 @@
-/* Arquivo: style.css (VERSÃO 5.9 - Responsivo Stacked) 
-   Esta é a versão correta para o tablet em pé (800px) 
-   e monitores.
-*/
+/* Arquivo: style.css (VERSÃO 6.0 - Implementa Menu Lateral Deslizante) */
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -35,19 +32,21 @@ body {
     display: flex;
     height: 100vh;
     margin: 0;
-    overflow: hidden; /* <-- Padrão desktop */
+    overflow: hidden;
 }
 
 /* --- BARRA LATERAL --- */
 .sidebar {
-    width: 420px; /* <-- Largura padrão desktop */
+    width: 420px;
     flex-shrink: 0;
     background-color: var(--secondary-color);
     border-right: 1px solid var(--border-color);
-    height: 100vh; /* <-- Altura padrão desktop */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     padding: 0;
+    /* (NOVO) Adiciona transição para o slide */
+    transition: transform 0.3s ease-in-out;
 }
 
 .sidebar h2 {
@@ -62,39 +61,25 @@ body {
 /* --- GUIA DE COMANDOS --- */
 .command-guide {
     flex-grow: 1;
-    /* Ocupa o espaço */
     overflow-y: auto;
-    /* Apenas o guia rola */
 }
 
 /* --- BARRA DE ROLAGEM CUSTOMIZADA --- */
-/* Firefox */
 .command-guide {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--secondary-color);
 }
-
-/* Chrome, Edge, Safari */
-.command-guide::-webkit-scrollbar {
-    width: 10px;
-}
-
+.command-guide::-webkit-scrollbar { width: 10px; }
 .command-guide::-webkit-scrollbar-track {
     background: var(--secondary-color);
     border-radius: 10px;
 }
-
 .command-guide::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border-radius: 10px;
     border: 2px solid var(--secondary-color);
 }
-
-.command-guide::-webkit-scrollbar-thumb:hover {
-    background-color: var(--primary-color);
-}
-
-/* --- FIM BARRA DE ROLAGEM --- */
+.command-guide::-webkit-scrollbar-thumb:hover { background-color: var(--primary-color); }
 
 .command-guide h4 {
     color: #aaa;
@@ -124,10 +109,7 @@ body {
     padding-left: 24px;
     padding-right: 24px;
 }
-
-.command-list li {
-    margin-bottom: 10px;
-}
+.command-list li { margin-bottom: 10px; }
 
 /* --- BOTÃO DE AÇÃO RÁPIDA --- */
 .quick-reply-btn {
@@ -147,13 +129,11 @@ body {
     text-align: left;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-
 .quick-reply-btn:hover {
     background-color: #303030;
     border-color: var(--highlight-color);
 }
 
-/* Comandos manuais (sem clique) */
 .command-list code {
     font-family: 'Courier New', Courier, monospace;
     background-color: #252525;
@@ -167,7 +147,6 @@ body {
     word-break: break-all;
     border: 1px solid #333;
 }
-
 .guide-tip {
     font-size: 0.8rem;
     color: #888;
@@ -178,8 +157,6 @@ body {
     padding-right: 24px;
 }
 
-/* --- FIM DO GUIA DE COMANDOS --- */
-
 /* --- RODAPÉ DA BARRA LATERAL --- */
 .sidebar-footer {
     flex-shrink: 0;
@@ -187,19 +164,17 @@ body {
     text-align: center;
     border-top: 1px solid var(--border-color);
 }
-
 .sidebar-footer p {
     font-size: 0.8rem;
     color: #777;
     font-style: italic;
 }
 
-/* --- FIM DO RODAPÉ --- */
 
 /* --- CONTAINER DO CHAT --- */
 .chat-container {
     flex-grow: 1;
-    height: 100vh; /* <-- Altura padrão desktop */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -214,8 +189,11 @@ body {
     flex-shrink: 0;
     position: relative;
     z-index: 10;
+    /* (NOVO) Adiciona flex para alinhar o botão */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
 .chat-header h1 {
     font-size: 1.5rem;
     font-weight: 500;
@@ -232,7 +210,7 @@ body {
     padding: 20px 0;
 }
 
-/* --- Scrollbar Chat (sem mudanças) --- */
+/* --- Scrollbar Chat --- */
 .chat-messages::-webkit-scrollbar { width: 10px; }
 .chat-messages::-webkit-scrollbar-track { background: var(--bg-color); }
 .chat-messages::-webkit-scrollbar-thumb {
@@ -245,7 +223,6 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--bg-color);
 }
-/* Fim Scrollbar Chat */
 
 .message {
     padding: 12px 18px;
@@ -256,19 +233,16 @@ body {
     margin-left: 20px;
     margin-right: 20px;
 }
-
 .message p {
     margin: 0;
     white-space: pre-wrap;
 }
-
 .bot-message {
     background-color: var(--bot-bg);
     color: var(--text-color);
     border-bottom-left-radius: 4px;
     align-self: flex-start;
 }
-
 .user-message {
     background-color: var(--user-bg);
     color: white;
@@ -276,7 +250,7 @@ body {
     align-self: flex-end;
 }
 
-/* --- INDICADOR DE CARREGAMENTO (sem mudanças) --- */
+/* --- INDICADOR DE CARREGAMENTO (JÁ EXISTIA) --- */
 .message.bot-message.loading {
     padding: 14px 18px;
     width: 80px;
@@ -311,13 +285,11 @@ body {
     width: 100%;
     padding: 20px 0;
 }
-
 #chat-form {
     display: flex;
     gap: 10px;
     padding: 0 20px;
 }
-
 #message-input {
     flex-grow: 1;
     background-color: var(--bot-bg);
@@ -328,14 +300,12 @@ body {
     font-size: 1rem;
     font-family: 'Roboto', sans-serif;
 }
-
 #message-input::placeholder { color: #888; }
 #message-input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 5px rgba(150, 52, 249, 0.5);
 }
-
 #send-button {
     background-color: var(--primary-color);
     color: white;
@@ -351,84 +321,104 @@ body {
     transition: background-color 0.2s ease;
     flex-shrink: 0;
 }
-
 #send-button svg { margin-left: -2px; }
 #send-button:hover { background-color: #7a29c7; }
 
 
-/* --- (MUDANÇA) RESPONSIVIDADE --- */
-/* * Este breakpoint (850px) irá ativar no seu tablet em pé (800px)
- * e em celulares.
- * Ele NÃO será ativado no seu tablet deitado (1280px) ou monitor.
+/* --- (NOVO) ESTILOS DO MENU RESPONSIVO --- */
+
+/* 1. O Botão de Menu (Hambúrguer) */
+.menu-toggle-btn {
+    display: none; /* <-- Escondido por padrão (desktop) */
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 11;
+}
+.menu-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 2. O Fundo Escurecido (Overlay) */
+.overlay {
+    display: none; /* <-- Escondido por padrão */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* 3. Classe .is-open (controlada pelo JS) */
+.overlay.is-open {
+    display: block;
+    opacity: 1;
+}
+
+
+/* --- (NOVO) RESPONSIVIDADE --- */
+
+/* * Breakpoint de 900px.
+ * Pega tablets em pé (como o seu de 800px) e celulares.
 */
-@media (max-width: 850px) {
+@media (max-width: 900px) {
 
-    /* 1. Muda a direção do body para empilhar */
+    /* 1. O body não é mais flex lado-a-lado */
     body {
-        flex-direction: column;
-        overflow-y: auto; /* Permite scroll se precisar (ex: teclado) */
+        display: block; 
     }
 
-    /* 2. Transforma a Sidebar em um cabeçalho */
+    /* 2. Mostra o botão de menu */
+    .menu-toggle-btn {
+        display: block;
+    }
+    
+    /* 3. O H1 no header precisa de espaço para o botão */
+    .chat-header h1 {
+        padding-left: 40px;
+    }
+
+    /* 4. A Sidebar agora é um menu flutuante */
     .sidebar {
-        width: 100%; /* Ocupa 100% da largura */
-        height: auto; /* Altura automática */
-        max-height: 45vh; /* Limita a 45% da altura da tela */
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        flex-shrink: 0; /* Não deixa encolher */
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 1000;
+        border-right: 1px solid var(--border-color);
+        
+        /* Começa fora da tela */
+        transform: translateX(-100%);
+        
+        /* Define a largura máxima em telas menores */
+        width: 90%;
+        max-width: 420px;
     }
 
-    /* 3. Ajusta o conteúdo da sidebar */
-    .sidebar h2 {
-        font-size: 1.15rem;
-        padding: 15px 20px 0;
-        margin-bottom: 15px;
+    /* 5. Classe .is-open (controlada pelo JS) */
+    .sidebar.is-open {
+        transform: translateX(0); /* <-- Traz o menu para a tela */
     }
 
-    .command-guide {
-        /* O guia de comando rola internamente */
-        overflow-y: auto;
-        flex-grow: 0; /* Desativa o flex-grow */
-        /* Ajusta paddings para telas menores */
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    .command-guide h4,
-    .guide-title,
-    .command-list,
-    .guide-tip {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    .guide-tip {
-        padding-bottom: 15px;
-    }
-
-    .sidebar-footer {
-        padding: 15px 20px;
-    }
-
-    /* 4. O Chat ocupa o espaço restante */
+    /* 6. O Chat agora ocupa 100% da largura */
     .chat-container {
         width: 100%;
-        height: auto; /* Altura automática */
-        flex-grow: 1; /* Ocupa todo o espaço vertical restante */
-        min-height: 55vh; /* Garante que o chat tenha pelo menos 55% da tela */
-    }
-    
-    .chat-header h1 {
-        font-size: 1.25rem;
     }
 
-    /* 5. Ajustes de padding para telas menores */
+    /* 7. Ajustes de padding (Corrige o botão cortado) */
     #chat-form {
         padding: 0 10px;
-    }
-    .chat-input-form {
-        padding: 15px 0;
     }
     .message {
         margin-left: 10px;
