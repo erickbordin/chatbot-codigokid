@@ -1,29 +1,61 @@
-// Arquivo: script.js (VERSÃO 7.9 - Adiciona botões rápidos e loading)
+// Arquivo: script.js (VERSÃO 8.0 - Adiciona menu lateral + Mantém loading "...")
 
 // --- Elementos do DOM ---
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
-const quickReplyButtons = document.querySelectorAll('.quick-reply-btn'); // NOVO
+const quickReplyButtons = document.querySelectorAll('.quick-reply-btn');
+
+// --- (NOVO) Elementos do Menu ---
+const menuToggleBtn = document.getElementById('menu-toggle-btn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+// --- FIM DA NOVA SEÇÃO ---
+
 
 // --- Event Listeners ---
 chatForm.addEventListener('submit', handleSubmit);
 
-// --- (NOVO) Event Listeners para Botões Rápidos ---
+// --- (NOVO) Listeners para Abrir/Fechar Menu ---
+menuToggleBtn.addEventListener('click', toggleMenu);
+overlay.addEventListener('click', closeMenu);
+// --- FIM DA NOVA SEÇÃO ---
+
+
+// --- (ATUALIZADO) Event Listeners para Botões Rápidos ---
 quickReplyButtons.forEach(button => {
     button.addEventListener('click', (e) => {
-        const command = e.target.textContent; // Pega o texto do botão clicado
-        messageInput.value = command; // Coloca o texto no campo de input
-        chatForm.requestSubmit(); // Envia o formulário
+        const command = e.target.textContent; 
+        messageInput.value = command; 
+        chatForm.requestSubmit(); 
+        
+        // (NOVO) Fecha o menu ao clicar em um botão
+        closeMenu(); 
     });
 });
+// --- FIM DA MUDANÇA ---
+
+
+// --- (NOVAS) Funções de Controle do Menu ---
+/** Abre/Fecha o menu */
+function toggleMenu() {
+    sidebar.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+}
+
+/** Força o fechamento do menu */
+function closeMenu() {
+    sidebar.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+}
 // --- FIM DA NOVA SEÇÃO ---
 
 
 /**
  * Lida com o envio do formulário (mensagem do usuário)
-*/
+ * (LÓGICA DO LOADING "..." JÁ ESTÁ AQUI)
+ */
 async function handleSubmit(e) {
     e.preventDefault();
     const userMessage = messageInput.value.trim();
@@ -33,37 +65,38 @@ async function handleSubmit(e) {
     displayMessage(userMessage, 'user');
     messageInput.value = '';
 
-    // --- (NOVO) Indicador de Carregamento ---
+    // --- (EXISTENTE) Indicador de Carregamento "..." ---
     const loadingMessage = displayMessage('', 'bot loading');
-    // --- FIM DA MUDANÇA ---
+    // --- FIM ---
 
     try {
         const botResponse = await processUserMessage(userMessage);
-        loadingMessage.remove();
+        
+        // (EXISTENTE) Remove o "..." e mostra a resposta
+        loadingMessage.remove(); 
         displayMessage(botResponse, 'bot');
 
     } catch (error) {
-        loadingMessage.remove();
-        // Exibe a mensagem de erro que veio da API ou do fetch
+        // (EXISTENTE) Remove o "..." em caso de erro
+        loadingMessage.remove(); 
         displayMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'bot');
-        console.error("Erro completo:", error); // Loga o erro completo no console
+        console.error("Erro completo:", error);
     }
 }
 
 /**
  * Adiciona uma mensagem à interface do chat
+ * (LÓGICA DO LOADING "..." JÁ ESTÁ AQUI)
  */
 function displayMessage(message, sender) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${sender}-message`;
 
-    // --- (NOVO) Se não for loading, processa o texto ---
+    // (EXISTENTE) Se não for loading, processa o texto
     if (!sender.includes('loading')) {
-        // Converte quebras de linha \n em tags <br> para exibição no HTML
         message = message.replace(/\n/g, '<br>');
         messageElement.innerHTML = `<p>${message}</p>`;
     }
-    // --- FIM DA MUDANÇA ---
 
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -73,14 +106,14 @@ function displayMessage(message, sender) {
 
 /**
 * Interpreta a mensagem do usuário e decide qual ação tomar (GET ou POST).
-* (VERSÃO 7.8 - ADICIONA CONSULTA DE LOGIN)
+* (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
 */
 async function processUserMessage(message) {
     const cleanedMessage = message.trim().replace(/[.!?]$/, '');
     const lowerMessage = cleanedMessage.toLowerCase();
     let match;
 
-    console.log(`DEBUG: processUserMessage v7.8 recebido: "${message}" -> "${cleanedMessage}"`);
+    console.log(`DEBUG: processUserMessage v8.0 recebido: "${message}" -> "${cleanedMessage}"`);
 
     // --- AÇÕES DE ESCRITA (POST) ---
 
@@ -95,46 +128,46 @@ async function processUserMessage(message) {
         const dataInicio = data_raw ? data_raw.trim() : '';
 
         if (!nome || !curso || !dataInicio) {
-            console.error("DEBUG v7.8: Match 'adicionar' falhou em capturar dados.", { nome, curso, dataInicio });
+            console.error("DEBUG v8.0: Match 'adicionar' falhou em capturar dados.", { nome, curso, dataInicio });
             return "Comando 'adicionar' incompleto. Use: Adicionar aluno [Nome] no curso [Curso] com inicio [dd/mm/aaaa]";
         }
         const dataToSend = { action: 'adicionar', nome, curso, dataInicio };
-        console.log("DEBUG v7.8: Acionando Ação 1 (Adicionar). Enviando:", dataToSend);
+        console.log("DEBUG v8.0: Acionando Ação 1 (Adicionar). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
     // 2. ADICIONAR OBSERVAÇÃO
     match = cleanedMessage.match(/(adicionar|nova)\s+(observação|obs|anotação)\s+\[?(.+?)\]?\s+(?:para|d[oa]|n[oa])\s*(?:[oa]\s+)?alun(?:a|o)?\s+\[?(.+?)\]?$/i);
     if (match) {
-        console.log("DEBUG v7.8: Regex de Observação BATEU!");
+        console.log("DEBUG v8.0: Regex de Observação BATEU!");
         const [, , , obs_raw, nome_raw] = match; // Índices: 3, 4
         const obs = obs_raw ? obs_raw.trim() : '';
         const nome = nome_raw ? nome_raw.trim() : '';
 
         if (!obs || !nome) {
-            console.error("DEBUG v7.8: Match 'atualizar_obs' falhou em capturar dados.", { obs, nome });
+            console.error("DEBUG v8.0: Match 'atualizar_obs' falhou em capturar dados.", { obs, nome });
             return "Comando 'observação' incompleto. Use: Adicionar observação [Texto] para o aluno [Nome]";
         }
         const dataToSend = { action: 'atualizar_obs', nome, obs };
-        console.log("DEBUG v7.8: Acionando Ação 2 (Observação). Enviando:", dataToSend);
+        console.log("DEBUG v8.0: Acionando Ação 2 (Observação). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
     // 3. ATUALIZAR DATA
     match = cleanedMessage.match(/(atualizar|mudar)\s+data\s+d(?:o|a)\s+alun(?:a|o)?\s+\[?(.*?)\]?\s+para\s+\[?(\d{2}\/\d{2}\/\d{4})\]?/i);
     if (match) {
-        console.log("DEBUG v7.8: Regex de Atualizar Data BATEU!");
+        console.log("DEBUG v8.0: Regex de Atualizar Data BATEU!");
         // Grupos: 1(verbo), 2(NOME), 3(DATA)
         const [, , nome_raw, novaData_raw] = match; // CORRETO: Índices 2, 3
         const nome = nome_raw ? nome_raw.trim() : '';
         const novaData = novaData_raw ? novaData_raw.trim() : '';
 
         if (!nome || !novaData) {
-            console.error("DEBUG v7.8: Match 'atualizar_data' falhou em capturar dados.", { nome, novaData });
+            console.error("DEBUG v8.0: Match 'atualizar_data' falhou em capturar dados.", { nome, novaData });
             return "Comando 'atualizar data' incompleto. Use: Atualizar data do aluno [Nome] para [dd/mm/aaaa]";
         }
         const dataToSend = { action: 'atualizar_data', nome, novaData };
-        console.log("DEBUG v7.8: Acionando Ação 3 (Atualizar Data). Enviando:", dataToSend);
+        console.log("DEBUG v8.0: Acionando Ação 3 (Atualizar Data). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
@@ -144,25 +177,23 @@ async function processUserMessage(message) {
         let nome = match[2].trim();
         nome = nome.replace(/^\[|\]$/g, '').trim();
         if (!nome) {
-            console.error("DEBUG v7.8: Match 'remover' falhou em capturar nome.");
+            console.error("DEBUG v8.0: Match 'remover' falhou em capturar nome.");
 
             return "Comando 'remover' incompleto. Use: Remover aluno [Nome]";
         }
         const dataToSend = { action: 'remover', nome: nome };
-        console.log("DEBUG v7.8: Acionando Ação 4 (Remover). Enviando:", dataToSend);
+        console.log("DEBUG v8.0: Acionando Ação 4 (Remover). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
-    // --- NOVO (v2.0) - CONSULTAR LOGINS DA TURMA ATUAL ---
-    // Esta regex pega "quais os logins de agora", "me de os logins", "senhas de agora", etc.
+    // --- CONSULTAR LOGINS DA TURMA ATUAL ---
     match = lowerMessage.match(/(quais|me de|me da|os)\s+(logins?|senhas?)\s+(d[ao]s?\s+)?(alunos?\s+)?(de\s+)?(agora|hoje|atuais?)/i);
     if (match) {
-        console.log("DEBUG v7.8: Acionando Consulta de Logins da Turma Atual.");
-        // Chama getDataFromAPI com a nova 'action'
+        console.log("DEBUG v8.0: Acionando Consulta de Logins da Turma Atual.");
         return await getDataFromAPI('logins_agora', {}, 'logins_agora');
     }
 
-    console.log("DEBUG v7.8: Nenhuma Ação (POST) bateu. Verificando Consultas (GET)...");
+    console.log("DEBUG v8.0: Nenhuma Ação (POST) bateu. Verificando Consultas (GET)...");
 
     // --- AÇÕES DE CONSULTA (GET) ---
 
@@ -170,7 +201,7 @@ async function processUserMessage(message) {
     match = lowerMessage.match(/(?:no dia|para a data de)\s+(\d{2}\/\d{2}\/\d{4})/);
     if (match) {
         const dataBusca = match[1];
-        console.log("DEBUG v7.8: Acionando Consulta 5 (Data Específica). Data:", dataBusca);
+        console.log("DEBUG v8.0: Acionando Consulta 5 (Data Específica). Data:", dataBusca);
         return await getDataFromAPI('data_especifica', { data: dataBusca });
     }
 
@@ -178,25 +209,25 @@ async function processUserMessage(message) {
     match = lowerMessage.match(/próximos\s+(\d+)\s+dias/);
     if (match) {
         const dias = match[1];
-        console.log("DEBUG v7.8: Acionando Consulta 6 (Próximos Dias). Dias:", dias);
+        console.log("DEBUG v8.0: Acionando Consulta 6 (Próximos Dias). Dias:", dias);
         return await getDataFromAPI('proximos_dias', { dias: dias });
     }
 
     // 7. CONSULTA: ESSA SEMANA
     if (lowerMessage.includes('essa semana') || lowerMessage.includes('esta semana') || lowerMessage.includes('nos próximos 7 dias')) {
-        console.log("DEBUG v7.8: Acionando Consulta 7 (Semana).");
+        console.log("DEBUG v8.0: Acionando Consulta 7 (Semana).");
         return await getDataFromAPI('semana');
     }
 
     // 8. CONSULTA: MÊS QUE VEM
     if (lowerMessage.includes('mês que vem') || lowerMessage.includes('proximo mes')) {
-        console.log("DEBUG v7.8: Acionando Consulta 8 (Mês Que Vem).");
+        console.log("DEBUG v8.0: Acionando Consulta 8 (Mês Que Vem).");
         return await getDataFromAPI('mes_que_vem');
     }
 
     // 9. CONSULTA: ANO QUE VEM
     if (lowerMessage.includes('ano que vem') || lowerMessage.includes('proximo ano')) {
-        console.log("DEBUG v7.8: Acionando Consulta 9 (Ano Que Vem).");
+        console.log("DEBUG v8.0: Acionando Consulta 9 (Ano Que Vem).");
         return await getDataFromAPI('ano_que_vem');
     }
 
@@ -204,13 +235,13 @@ async function processUserMessage(message) {
     match = lowerMessage.match(/em\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)/i);
     if (match) {
         const mes = match[1];
-        console.log("DEBUG v7.8: Acionando Consulta 10 (Mês Específico). Mês:", mes);
+        console.log("DEBUG v8.0: Acionando Consulta 10 (Mês Específico). Mês:", mes);
         return await getDataFromAPI('mes', { mes: mes });
     }
 
     // 11. CONSULTA: ATRASADO
     if (lowerMessage.includes('atrasado') || lowerMessage.includes('vencido') || lowerMessage.includes('fora do prazo')) {
-        console.log("DEBUG v7.8: Acionando Consulta 11 (Atrasado).");
+        console.log("DEBUG v8.0: Acionando Consulta 11 (Atrasado).");
         return await getDataFromAPI('atrasado');
     }
 
@@ -219,7 +250,7 @@ async function processUserMessage(message) {
     if (match) {
         const anoBusca = match[1];
         if (anoBusca && parseInt(anoBusca) > 2000 && parseInt(anoBusca) < 2100) {
-            console.log("DEBUG v7.8: Acionando Consulta 12 (Ano Conclusão). Ano:", anoBusca);
+            console.log("DEBUG v8.0: Acionando Consulta 12 (Ano Conclusão). Ano:", anoBusca);
             return await getDataFromAPI('ano_conclusao', { ano: anoBusca });
         }
     }
@@ -241,35 +272,34 @@ async function processUserMessage(message) {
                 'excluir', 'deletar', 'cadastrar', 'novo', 'mudar', 'observação', 'obs',
                 'anotação', 'próximos', 'proximo', 'ano', 'data', 'inicio', 'curso',
                 'para', 'com', 'quem', 'qual', 'quais', 'em', 'no', 'do', 'da', 'a', 'o',
-                'logins', 'senhas', 'agora', 'hoje' // Adiciona stopwords da nova função
+                'logins', 'senhas', 'agora', 'hoje'
             ];
             const isStopWord = stopWords.includes(nomeBusca.toLowerCase());
             const hasNumbersOrSlash = /[\d\/]/.test(nomeBusca);
             if (!isStopWord && !hasNumbersOrSlash && nomeBusca.length > 1) {
-                console.log("DEBUG v7.8: Acionando Consulta 13 (Nome Aluno). Nome:", nomeBusca);
+                console.log("DEBUG v8.0: Acionando Consulta 13 (Nome Aluno). Nome:", nomeBusca);
                 return await getDataFromAPI('nome_aluno', { nome: nomeBusca });
             } else {
-                console.log("DEBUG v7.8: Possível match de nome (", nomeBusca, ") ignorado.");
+                console.log("DEBUG v8.0: Possível match de nome (", nomeBusca, ") ignorado.");
             }
         }
     }
 
     // Se NENHUM comando for reconhecido
-    console.log("DEBUG v7.8: Nenhum comando reconhecido.");
+    console.log("DEBUG v8.0: Nenhum comando reconhecido.");
     return "Desculpe, não entendi o comando. Tente os exemplos ao lado.";
 }
 
 
 /**
- * Função para ENVIAR dados (POST) para o Google Apps Script (COM WORKAROUND CORS)
+ * Função para ENVIAR dados (POST) para o Google Apps Script
+ * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
  */
 async function sendDataToAPI(data) {
-    console.log("DEBUG: sendDataToAPI chamado com:", data); // Log antes do fetch
+    console.log("DEBUG: sendDataToAPI chamado com:", data); 
 
-    // A variável API_URL DEVE estar definida no seu arquivo HTML
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
-
     }
 
     const response = await fetch(API_URL, {
@@ -299,7 +329,6 @@ async function sendDataToAPI(data) {
         if (result.status === 'success') {
             return result.message;
         } else {
-            // Usa a mensagem de erro específica do backend
             throw new Error(result.message || "A API retornou um erro sem mensagem específica.");
         }
     } catch (parseError) {
@@ -311,25 +340,20 @@ async function sendDataToAPI(data) {
 
 /**
  * Função para BUSCAR dados (GET) do Google Apps Script
- * (VERSÃO ATUALIZADA v2.0 - Aceita 'action' customizada)
+ * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
  */
-async function getDataFromAPI(filtro, params = {}, action = 'consultar') { // <-- MUDANÇA AQUI
-    // A variável API_URL DEVE estar definida no seu arquivo HTML
+async function getDataFromAPI(filtro, params = {}, action = 'consultar') { 
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
     }
 
     const url = new URL(API_URL);
-
-    // --- MUDANÇA AQUI ---
-    // Agora usa a 'action' passada, ou 'consultar' como padrão
     url.searchParams.append('action', action);
-
-    url.searchParams.append('filtro', filtro); // 'filtro' ainda é usado
+    url.searchParams.append('filtro', filtro); 
     for (const key in params) {
         url.searchParams.append(key, params[key]);
     }
-    console.log(`DEBUG: getDataFromAPI chamando URL: ${url.toString()}`); // Log da URL GET
+    console.log(`DEBUG: getDataFromAPI chamando URL: ${url.toString()}`);
 
     const response = await fetch(url, {
         method: 'GET',
