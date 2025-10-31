@@ -1,4 +1,4 @@
-/* Arquivo: style.css (VERSÃO 5.5 - Remove Padding Horizontal Chat - Limpo) */
+/* Arquivo: style.css (VERSÃO 5.5 - Corrigido) */
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -404,7 +404,8 @@ body {
 }
 
 /* --- RESPONSIVIDADE --- */
-@media (max-width: 768px) {
+/* (MUDANÇA) Ajustado de 768px para 1024px para cobrir tablets em modo retrato */
+@media (max-width: 1024px) {
     .sidebar {
         display: none;
     }
