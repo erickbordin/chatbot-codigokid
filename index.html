@@ -2,91 +2,94 @@
 <html lang="pt-br">
 
 <head>
-       
     <meta charset="UTF-8">
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Assistente Código Kid</title>
-       
+    <title>Assistente Código Kid</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-       
-        <aside class="sidebar">
-                <h2>Assistente Código Kid</h2>
 
-                <div class="command-guide">
-                        <h4>Perguntas Prontas (Clique para enviar)</h4>
-                       
-                        <p class="guide-title">Logins</p>
-                        <ul class="command-list">
-                                <li><button class="quick-reply-btn">Quais os logins de agora?</button></li>
-                            </ul>
+    <aside class="sidebar" id="sidebar">
+        <h2>Assistente Código Kid</h2>
 
-                        <p class="guide-title">Prazos Imediatos</p>
-                        <ul class="command-list">
-                                <li><button class="quick-reply-btn">Quem está atrasado?</button></li>
-                                <li><button class="quick-reply-btn">Quem finaliza essa semana?</button></li>
-                                <li><button class="quick-reply-btn">Quem finaliza nos próximos 7 dias?</button></li>
-                            </ul>
+        <div class="command-guide">
+            <h4>Perguntas Prontas (Clique para enviar)</h4>
+            
+            <p class="guide-title">Logins</p>
+            <ul class="command-list">
+                <li><button class="quick-reply-btn">Quais os logins de agora?</button></li>
+            </ul>
 
-                        <p class="guide-title">Prazos Futuros</p>
-                        <ul class="command-list">
-                                <li><button class="quick-reply-btn">Quem finaliza nos próximos 30 dias?</button></li>
-                                <li><button class="quick-reply-btn">Quem finaliza mês que vem?</button></li>
-                                <li><button class="quick-reply-btn">Quem finaliza ano que vem?</button></li>
-                            </ul>
+            <p class="guide-title">Prazos Imediatos</p>
+            <ul class="command-list">
+                <li><button class="quick-reply-btn">Quem está atrasado?</button></li>
+                <li><button class="quick-reply-btn">Quem finaliza essa semana?</button></li>
+                <li><button class="quick-reply-btn">Quem finaliza nos próximos 7 dias?</button></li>
+            </ul>
 
-                        <p class="guide-title">Prazos Específicos</p>
-                        <ul class="command-list">
-                                <li><button class="quick-reply-btn">Quem finaliza em janeiro?</button></li>
-                                <li><button class="quick-reply-btn">Quem finaliza em 2025?</button></li>
-                            </ul>
+            <p class="guide-title">Prazos Futuros</p>
+            <ul class="command-list">
+                <li><button class="quick-reply-btn">Quem finaliza nos próximos 30 dias?</button></li>
+                <li><button class="quick-reply-btn">Quem finaliza mês que vem?</button></li>
+                <li><button class="quick-reply-btn">Quem finaliza ano que vem?</button></li>
+            </ul>
 
-                        <p class="guide-title">Ações Manuais</p>
-                        <ul class="command-list">
-                                <li><code>Adicionar aluno [Nome] no curso [Curso] com inicio [dd/mm/aaaa]</code></li>
-                                <li><code>Adicionar observação [Texto] para o aluno [Nome]</code></li>
-                                <li><code>Atualizar data do aluno [Nome] para [dd/mm/aaaa]</code></li>
-                                <li><code>Remover aluno [Nome]</code></li>
-                            </ul>
-                        <p class="guide-tip">(Comandos de adicionar/remover devem ser digitados manualmente abaixo)</p>
-                    </div>    
-                        <footer class="sidebar-footer">
-                        <p>Feito por Érick Bordin</p>
-                    </footer>
-           
-            </aside>     <div class="chat-container">
-                <header class="chat-header">
-                        <h1>Assistente Código Kid</h1>
-                    </header>
-               
-                <main class="chat-messages" id="chat-messages">
-                        <div class="message bot-message">
-                                <p>Olá! Eu sou seu assistente da nossa equipe. 👋<br>Em que posso te ajudar?</p>
-                            </div>
-                    </main>
-               
-                <footer class="chat-input-form">
-                        <form id="chat-form">
-                                <input type="text" id="message-input" placeholder="Digite seu comando..."
+            <p class="guide-title">Prazos Específicos</p>
+            <ul class="command-list">
+                <li><button class="quick-reply-btn">Quem finaliza em janeiro?</button></li>
+                <li><button class="quick-reply-btn">Quem finaliza em 2025?</button></li>
+            </ul>
+
+            <p class="guide-title">Ações Manuais</p>
+            <ul class="command-list">
+                <li><code>Adicionar aluno [Nome] no curso [Curso] com inicio [dd/mm/aaaa]</code></li>
+                <li><code>Adicionar observação [Texto] para o aluno [Nome]</code></li>
+                <li><code>Atualizar data do aluno [Nome] para [dd/mm/aaaa]</code></li>
+                <li><code>Remover aluno [Nome]</code></li>
+            </ul>
+            <p class="guide-tip">(Comandos de adicionar/remover devem ser digitados manualmente abaixo)</p>
+        </div>
+        <footer class="sidebar-footer">
+            <p>Feito por Érick Bordin</p>
+        </footer>
+    </aside>
+
+    <div class="chat-container">
+        <header class="chat-header">
+
+            <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="white"/>
+                </svg>
+            </button>
+            
+            <h1>Assistente Código Kid</h1>
+        </header>
+        
+        <main class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                <p>Olá! Eu sou seu assistente da nossa equipe. 👋<br>Em que posso te ajudar?</p>
+            </div>
+        </main>
+        
+        <footer class="chat-input-form">
+            <form id="chat-form">
+                <input type="text" id="message-input" placeholder="Digite seu comando..."
                     autocomplete="off" required>
-                                <button type="submit" id="send-button" aria-label="Enviar">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                <button type="submit" id="send-button" aria-label="Enviar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
-                                               
                         <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="white" />
-                                           
                     </svg>
-                                    </button>
-                            </form>
-                    </footer>
-            </div>
+                </button>
+            </form>
+        </footer>
+    </div>
 
-       
+    <div class="overlay" id="overlay"></div>
+    
     <script src="config.js"></script>
-       
     <script src="script.js"></script>
 </body>
 
