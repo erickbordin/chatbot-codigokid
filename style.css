@@ -30,8 +30,10 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
-    height: 100vh; /* Fallback para navegadores antigos */
-    height: 100dvh;/* Usa altura dinâmica (corrige teclado) */
+    height: 100vh;
+    /* Fallback para navegadores antigos */
+    height: 100dvh;
+    /* Usa altura dinâmica (corrige teclado) */
     margin: 0;
     /* overflow: hidden; (REMOVIDO na V6.1) */
 }
@@ -42,8 +44,10 @@ body {
     flex-shrink: 0;
     background-color: var(--secondary-color);
     border-right: 1px solid var(--border-color);
-    height: 100vh; /* Fallback para navegadores antigos */
-    height: 100dvh;/* Usa altura dinâmica */
+    height: 100vh;
+    /* Fallback para navegadores antigos */
+    height: 100dvh;
+    /* Usa altura dinâmica */
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -70,17 +74,25 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--secondary-color);
 }
-.command-guide::-webkit-scrollbar { width: 10px; }
+
+.command-guide::-webkit-scrollbar {
+    width: 10px;
+}
+
 .command-guide::-webkit-scrollbar-track {
     background: var(--secondary-color);
     border-radius: 10px;
 }
+
 .command-guide::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border-radius: 10px;
     border: 2px solid var(--secondary-color);
 }
-.command-guide::-webkit-scrollbar-thumb:hover { background-color: var(--primary-color); }
+
+.command-guide::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color);
+}
 
 .command-guide h4 {
     color: #aaa;
@@ -110,7 +122,10 @@ body {
     padding-left: 24px;
     padding-right: 24px;
 }
-.command-list li { margin-bottom: 10px; }
+
+.command-list li {
+    margin-bottom: 10px;
+}
 
 /* --- BOTÃO DE AÇÃO RÁPIDA --- */
 .quick-reply-btn {
@@ -130,6 +145,7 @@ body {
     text-align: left;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
+
 .quick-reply-btn:hover {
     background-color: #303030;
     border-color: var(--highlight-color);
@@ -148,6 +164,7 @@ body {
     word-break: break-all;
     border: 1px solid #333;
 }
+
 .guide-tip {
     font-size: 0.8rem;
     color: #888;
@@ -165,6 +182,7 @@ body {
     text-align: center;
     border-top: 1px solid var(--border-color);
 }
+
 .sidebar-footer p {
     font-size: 0.8rem;
     color: #777;
@@ -175,8 +193,10 @@ body {
 /* --- CONTAINER DO CHAT --- */
 .chat-container {
     flex-grow: 1;
-    height: 100vh; /* Fallback para navegadores antigos */
-    height: 100dvh;/* Usa altura dinâmica (corrige teclado) */
+    height: 100vh;
+    /* Fallback para navegadores antigos */
+    height: 100dvh;
+    /* Usa altura dinâmica (corrige teclado) */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -195,6 +215,7 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 .chat-header h1 {
     font-size: 1.5rem;
     font-weight: 500;
@@ -212,14 +233,24 @@ body {
 }
 
 /* --- Scrollbar Chat --- */
-.chat-messages::-webkit-scrollbar { width: 10px; }
-.chat-messages::-webkit-scrollbar-track { background: var(--bg-color); }
+.chat-messages::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
 .chat-messages::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border-radius: 10px;
     border: 2px solid var(--bg-color);
 }
-.chat-messages::-webkit-scrollbar-thumb:hover { background-color: var(--primary-color); }
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color);
+}
+
 .chat-messages {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--bg-color);
@@ -234,16 +265,19 @@ body {
     margin-left: 20px;
     margin-right: 20px;
 }
+
 .message p {
     margin: 0;
     white-space: pre-wrap;
 }
+
 .bot-message {
     background-color: var(--bot-bg);
     color: var(--text-color);
     border-bottom-left-radius: 4px;
     align-self: flex-start;
 }
+
 .user-message {
     background-color: var(--user-bg);
     color: white;
@@ -260,6 +294,7 @@ body {
     margin-left: 20px;
     margin-right: 20px;
 }
+
 .loading::after {
     content: "";
     display: block;
@@ -270,13 +305,34 @@ body {
     box-shadow: 15px 0 #888, -15px 0 #888;
     animation: bot-loading 1s infinite ease-in-out;
 }
+
 @keyframes bot-loading {
-    0%   { background-color: #888; box-shadow: 15px 0 #888, -15px 0 #888; }
-    25%  { background-color: #555; box-shadow: 15px 0 #888, -15px 0 #888; }
-    50%  { background-color: #888; box-shadow: 15px 0 #555, -15px 0 #888; }
-    75%  { background-color: #888; box-shadow: 15px 0 #888, -15px 0 #555; }
-    100% { background-color: #888; box-shadow: 15px 0 #888, -15px 0 #888; }
+    0% {
+        background-color: #888;
+        box-shadow: 15px 0 #888, -15px 0 #888;
+    }
+
+    25% {
+        background-color: #555;
+        box-shadow: 15px 0 #888, -15px 0 #888;
+    }
+
+    50% {
+        background-color: #888;
+        box-shadow: 15px 0 #555, -15px 0 #888;
+    }
+
+    75% {
+        background-color: #888;
+        box-shadow: 15px 0 #888, -15px 0 #555;
+    }
+
+    100% {
+        background-color: #888;
+        box-shadow: 15px 0 #888, -15px 0 #888;
+    }
 }
+
 /* --- FIM DO LOADING --- */
 
 .chat-input-form {
@@ -286,11 +342,13 @@ body {
     width: 100%;
     padding: 20px 0;
 }
+
 #chat-form {
     display: flex;
     gap: 10px;
     padding: 0 20px;
 }
+
 #message-input {
     flex-grow: 1;
     background-color: var(--bot-bg);
@@ -301,12 +359,17 @@ body {
     font-size: 1rem;
     font-family: 'Roboto', sans-serif;
 }
-#message-input::placeholder { color: #888; }
+
+#message-input::placeholder {
+    color: #888;
+}
+
 #message-input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 5px rgba(150, 52, 249, 0.5);
 }
+
 #send-button {
     background-color: var(--primary-color);
     color: white;
@@ -322,15 +385,22 @@ body {
     transition: background-color 0.2s ease;
     flex-shrink: 0;
 }
-#send-button svg { margin-left: -2px; }
-#send-button:hover { background-color: #7a29c7; }
+
+#send-button svg {
+    margin-left: -2px;
+}
+
+#send-button:hover {
+    background-color: #7a29c7;
+}
 
 
 /* --- (NOVO) ESTILOS DO MENU RESPONSIVO --- */
 
 /* 1. O Botão de Menu (Hambúrguer) */
 .menu-toggle-btn {
-    display: none; /* <-- Escondido por padrão (desktop) */
+    display: none;
+    /* <-- Escondido por padrão (desktop) */
     background: none;
     border: none;
     color: white;
@@ -343,13 +413,15 @@ body {
     transform: translateY(-50%);
     z-index: 11;
 }
+
 .menu-toggle-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 2. O Fundo Escurecido (Overlay) */
 .overlay {
-    display: none; /* <-- Escondido por padrão */
+    display: none;
+    /* <-- Escondido por padrão */
     position: fixed;
     top: 0;
     left: 0;
@@ -377,14 +449,14 @@ body {
 
     /* 1. O body não é mais flex lado-a-lado */
     body {
-        display: block; 
+        display: block;
     }
 
     /* 2. Mostra o botão de menu */
     .menu-toggle-btn {
         display: block;
     }
-    
+
     /* 3. O H1 no header precisa de espaço para o botão */
     .chat-header h1 {
         padding-left: 40px;
@@ -396,13 +468,14 @@ body {
         top: 0;
         left: 0;
         height: 100%;
-        height: 100dvh; /* Garante altura dinâmica no menu tbm */
+        height: 100dvh;
+        /* Garante altura dinâmica no menu tbm */
         z-index: 1000;
         border-right: 1px solid var(--border-color);
-        
+
         /* Começa fora da tela */
         transform: translateX(-100%);
-        
+
         /* Define a largura máxima em telas menores */
         width: 90%;
         max-width: 420px;
@@ -410,30 +483,123 @@ body {
 
     /* 5. Classe .is-open (controlada pelo JS) */
     .sidebar.is-open {
-        transform: translateX(0); /* <-- Traz o menu para a tela */
+        transform: translateX(0);
+        /* <-- Traz o menu para a tela */
     }
 
     /* 6. O Chat agora ocupa 100% da largura */
     .chat-container {
         width: 100%;
-        height: 100%; /* (ALTERADO V6.1) Força o container a preencher o 'body' */
+        height: 100%;
+        /* (ALTERADO V6.1) Força o container a preencher o 'body' */
     }
 
     /* 7. Ajustes de padding (Corrige o botão cortado) */
-    
+
     .chat-input-form {
-        padding: 10px 0; 
+        padding: 10px 0;
     }
 
     #chat-form {
         padding: 0 10px;
     }
+
     .message {
         margin-left: 10px;
         margin-right: 10px;
     }
+
     .message.bot-message.loading {
         margin-left: 10px;
         margin-right: 10px;
     }
+}
+
+/* --- (NOVO v8.1) ESTILOS DA LISTA DE REPOSIÇÃO --- */
+
+#reposicao-list-container {
+    /* Remove o padding padrão da ul para os itens preencherem */
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* O <li> que contém o nome e os botões */
+.reposicao-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #252525;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 8px !important;
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+/* O <span> que contém o nome e n. de faltas */
+.reposicao-nome {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    /* Impede que o nome empurre os botões */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 10px;
+}
+
+/* Container para os 2 botões */
+.reposicao-botoes {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+/* Estilo base dos botões "Marcar" e "Remover" */
+.repo-btn {
+    border: none;
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Botão Verde */
+.repo-btn.repo-marcar {
+    background-color: #4CAF50;
+    /* Verde */
+    color: white;
+}
+
+.repo-btn.repo-marcar:hover {
+    background-color: #66BB6A;
+}
+
+/* Botão Vermelho */
+.repo-btn.repo-remover {
+    background-color: #F44336;
+    /* Vermelho */
+    color: white;
+}
+
+.repo-btn.repo-remover:hover {
+    background-color: #EF5350;
+}
+
+/* Botão de Atualizar */
+#refresh-reposicao-btn {
+    background-color: #252525;
+    color: #aaa;
+    font-weight: 500;
+    text-align: center;
+    border-color: #444;
+}
+
+#refresh-reposicao-btn:hover {
+    background-color: #303030;
+    border-color: #555;
+    color: #fff;
 }
