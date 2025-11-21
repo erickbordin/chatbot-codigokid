@@ -11,6 +11,9 @@ const quickReplyButtons = document.querySelectorAll('.quick-reply-btn');
 const menuToggleBtn = document.getElementById('menu-toggle-btn');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
+const reposicaoListContainer = document.getElementById('reposicao-list-container');
+const reposicaoLoading = document.getElementById('reposicao-loading');
+const refreshReposicaoBtn = document.getElementById('refresh-reposicao-btn');
 // --- FIM DA NOVA SEÇÃO ---
 
 
@@ -26,12 +29,12 @@ overlay.addEventListener('click', closeMenu);
 // --- (ATUALIZADO) Event Listeners para Botões Rápidos ---
 quickReplyButtons.forEach(button => {
     button.addEventListener('click', (e) => {
-        const command = e.target.textContent; 
-        messageInput.value = command; 
-        chatForm.requestSubmit(); 
-        
+        const command = e.target.textContent;
+        messageInput.value = command;
+        chatForm.requestSubmit();
+
         // (NOVO) Fecha o menu ao clicar em um botão
-        closeMenu(); 
+        closeMenu();
     });
 });
 // --- FIM DA MUDANÇA ---
@@ -71,14 +74,14 @@ async function handleSubmit(e) {
 
     try {
         const botResponse = await processUserMessage(userMessage);
-        
+
         // (EXISTENTE) Remove o "..." e mostra a resposta
-        loadingMessage.remove(); 
+        loadingMessage.remove();
         displayMessage(botResponse, 'bot');
 
     } catch (error) {
         // (EXISTENTE) Remove o "..." em caso de erro
-        loadingMessage.remove(); 
+        loadingMessage.remove();
         displayMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'bot');
         console.error("Erro completo:", error);
     }
@@ -296,7 +299,7 @@ async function processUserMessage(message) {
  * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
  */
 async function sendDataToAPI(data) {
-    console.log("DEBUG: sendDataToAPI chamado com:", data); 
+    console.log("DEBUG: sendDataToAPI chamado com:", data);
 
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
@@ -342,14 +345,14 @@ async function sendDataToAPI(data) {
  * Função para BUSCAR dados (GET) do Google Apps Script
  * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
  */
-async function getDataFromAPI(filtro, params = {}, action = 'consultar') { 
+async function getDataFromAPI(filtro, params = {}, action = 'consultar') {
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
     }
 
     const url = new URL(API_URL);
     url.searchParams.append('action', action);
-    url.searchParams.append('filtro', filtro); 
+    url.searchParams.append('filtro', filtro);
     for (const key in params) {
         url.searchParams.append(key, params[key]);
     }
@@ -384,3 +387,153 @@ async function getDataFromAPI(filtro, params = {}, action = 'consultar') {
         throw new Error(`A API (GET) retornou uma resposta inesperada (não JSON): ${responseText.substring(0, 100)}... Verifique os logs do Google Apps Script.`);
     }
 }
+
+/**
+* (NOVO v8.2) Busca a lista e MOSTRA O CURSO
+*/
+async function fetchReposicoes() {
+    console.log("DEBUG v8.2: Buscando lista de reposição...");
+    reposicaoLoading.style.display = 'block';
+
+    // 1. Limpa a lista antiga
+    const oldItems = reposicaoListContainer.querySelectorAll('.reposicao-item');
+    oldItems.forEach(item => item.remove());
+    const noStudentsMessage = reposicaoListContainer.querySelector('.reposicao-vazio');
+    if (noStudentsMessage) noStudentsMessage.remove();
+
+    try {
+        // 3. Chama a ação (ela agora retorna {nome, curso, faltas})
+        const alunos = await getDataFromAPI('consultar_reposicoes', {}, 'consultar_reposicoes');
+
+        reposicaoLoading.style.display = 'none';
+
+        if (!alunos || alunos.length === 0) {
+            // ... (código da mensagem "Nenhum aluno" - sem mudanças) ...
+            console.log("DEBUG v8.2: Nenhum aluno para reposição.");
+            const li = document.createElement('li');
+            li.className = 'reposicao-vazio';
+            li.style.color = "#888";
+            li.style.fontSize = "0.85rem";
+            li.style.padding = "0 24px 10px";
+            li.textContent = "Nenhum aluno com 1+ falta.";
+            reposicaoListContainer.appendChild(li);
+            return;
+        }
+
+        console.log(`DEBUG v8.2: Recebidos ${alunos.length} registros de reposição.`);
+
+        // 4. Cria os <li> para cada aluno/curso
+        alunos.forEach(aluno => {
+            const li = document.createElement('li');
+            li.className = 'reposicao-item';
+
+            const nomeSpan = document.createElement('span');
+            nomeSpan.className = 'reposicao-nome';
+
+            // --- (MUDANÇA AQUI) ---
+            // Agora mostra NOME - CURSO (FALTAS)
+            const displayText = `${aluno.nome} - ${aluno.curso} (${aluno.faltas} faltas)`;
+            nomeSpan.textContent = displayText;
+            nomeSpan.title = displayText; // Tooltip
+            // --- (FIM DA MUDANÇA) ---
+
+            const botoesDiv = document.createElement('div');
+            botoesDiv.className = 'reposicao-botoes';
+
+            // Botão Marcar (Verde)
+            const btnMarcar = document.createElement('button');
+            btnMarcar.className = 'repo-btn repo-marcar';
+            btnMarcar.textContent = 'Marcar';
+            btnMarcar.dataset.nome = aluno.nome; // Guarda o nome
+            btnMarcar.dataset.curso = aluno.curso; // <<< GUARDA O CURSO
+
+            // Botão Remover (Vermelho)
+            const btnRemover = document.createElement('button');
+            btnRemover.className = 'repo-btn repo-remover';
+            btnRemover.textContent = 'Remover';
+            btnRemover.dataset.nome = aluno.nome; // Guarda o nome
+            btnRemover.dataset.curso = aluno.curso; // <<< GUARDA O CURSO
+
+            botoesDiv.appendChild(btnMarcar);
+            botoesDiv.appendChild(btnRemover);
+
+            li.appendChild(nomeSpan);
+            li.appendChild(botoesDiv);
+
+            reposicaoListContainer.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar reposições:", error);
+        reposicaoLoading.style.display = 'none';
+        displayMessage(`Erro ao carregar lista de reposição: ${error.message}`, 'bot');
+    }
+}
+
+/**
+* (NOVO v8.2) Lida com cliques, ENVIANDO NOME + CURSO
+*/
+async function handleReposicaoClick(e) {
+    const targetButton = e.target.closest('.repo-btn');
+    if (!targetButton) return;
+
+    // --- (MUDANÇA AQUI) ---
+    const nomeAluno = targetButton.dataset.nome;
+    const cursoAluno = targetButton.dataset.curso; // <<< LÊ O CURSO
+
+    if (!nomeAluno || !cursoAluno) { // <<< CHECA OS DOIS
+        console.error("Botão de reposição clicado, mas 'data-nome' ou 'data-curso' não encontrado.");
+        return;
+    }
+    // --- (FIM DA MUDANÇA) ---
+
+    console.log(`DEBUG v8.2: Botão de reposição clicado para: ${nomeAluno} (Curso: ${cursoAluno})`);
+
+    const confirmou = confirm(`Tem certeza que deseja marcar a reposição para ${nomeAluno} (Curso: ${cursoAluno})?\n\nIsso irá ZERAR as faltas registradas para este aluno NESTE CURSO.`);
+
+    if (!confirmou) {
+        console.log("DEBUG v8.2: Ação de reposição cancelada.");
+        return;
+    }
+
+    const loadingMessage = displayMessage('', 'bot loading');
+
+    try {
+        // --- (MUDANÇA AQUI) ---
+        // Envia nome E curso para o backend
+        const dataToSend = { action: 'marcar_reposicao', nome: nomeAluno, curso: cursoAluno };
+        // --- (FIM DA MUDANÇA) ---
+
+        const responseMessage = await sendDataToAPI(dataToSend);
+
+        loadingMessage.remove();
+        displayMessage(responseMessage, 'bot');
+
+        // Atualiza a lista da sidebar (automaticamente)
+        await fetchReposicoes();
+
+    } catch (error) {
+        loadingMessage.remove();
+        displayMessage(`Erro ao marcar reposição: ${error.message}`, 'bot');
+        console.error("Erro completo (marcar_reposicao):", error);
+    }
+}
+
+/**
+* (NOVO v8.1) Inicia os listeners da aplicação
+*/
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM carregado. Iniciando app v8.1...");
+
+    // Listener para o botão de atualizar
+    refreshReposicaoBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede o "borbulhamento" do evento
+        fetchReposicoes();
+    });
+
+    // Listener para os botões "Marcar" / "Remover" (usando delegação)
+    reposicaoListContainer.addEventListener('click', handleReposicaoClick);
+
+    // Busca a lista de reposição assim que a página carrega
+    fetchReposicoes();
+});
