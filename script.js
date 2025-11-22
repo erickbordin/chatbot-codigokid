@@ -1,4 +1,4 @@
-// Arquivo: script.js (VERSÃO 8.0 - Adiciona menu lateral + Mantém loading "...")
+// Arquivo: script.js (VERSÃO 8.3 CORRIGIDA - Página de Reposição em Tela Cheia)
 
 // --- Elementos do DOM ---
 const chatMessages = document.getElementById('chat-messages');
@@ -7,80 +7,71 @@ const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const quickReplyButtons = document.querySelectorAll('.quick-reply-btn');
 
-// --- (NOVO) Elementos do Menu ---
+// --- Elementos do Menu ---
 const menuToggleBtn = document.getElementById('menu-toggle-btn');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
+
+// --- Elementos da Reposição (Sidebar v8.2 + Página v8.3) ---
 const reposicaoListContainer = document.getElementById('reposicao-list-container');
 const reposicaoLoading = document.getElementById('reposicao-loading');
 const refreshReposicaoBtn = document.getElementById('refresh-reposicao-btn');
-// --- FIM DA NOVA SEÇÃO ---
+const manageReposicaoBtn = document.getElementById('manage-reposicao-btn');
+const reposicaoPage = document.getElementById('reposicao-page');
+const reposicaoPageList = document.getElementById('reposicao-page-list');
+const reposicaoPageBackBtn = document.getElementById('repo-page-back-btn');
 
 
 // --- Event Listeners ---
 chatForm.addEventListener('submit', handleSubmit);
-
-// --- (NOVO) Listeners para Abrir/Fechar Menu ---
 menuToggleBtn.addEventListener('click', toggleMenu);
 overlay.addEventListener('click', closeMenu);
-// --- FIM DA NOVA SEÇÃO ---
 
-
-// --- (ATUALIZADO) Event Listeners para Botões Rápidos ---
+// --- Event Listeners para Botões Rápidos ---
 quickReplyButtons.forEach(button => {
     button.addEventListener('click', (e) => {
+        // CORREÇÃO: Pega o botão de refresh e impede que ele envie o chat
+        if (e.target.id === 'refresh-reposicao-btn') {
+            e.stopPropagation(); // Impede o 'submit'
+            return; // Sai da função
+        }
+
         const command = e.target.textContent;
         messageInput.value = command;
         chatForm.requestSubmit();
-
-        // (NOVO) Fecha o menu ao clicar em um botão
         closeMenu();
     });
 });
-// --- FIM DA MUDANÇA ---
 
-
-// --- (NOVAS) Funções de Controle do Menu ---
-/** Abre/Fecha o menu */
+// --- Funções de Controle do Menu ---
 function toggleMenu() {
     sidebar.classList.toggle('is-open');
     overlay.classList.toggle('is-open');
 }
 
-/** Força o fechamento do menu */
 function closeMenu() {
     sidebar.classList.remove('is-open');
     overlay.classList.remove('is-open');
 }
-// --- FIM DA NOVA SEÇÃO ---
-
 
 /**
  * Lida com o envio do formulário (mensagem do usuário)
- * (LÓGICA DO LOADING "..." JÁ ESTÁ AQUI)
  */
 async function handleSubmit(e) {
     e.preventDefault();
     const userMessage = messageInput.value.trim();
-
     if (!userMessage) return;
 
     displayMessage(userMessage, 'user');
     messageInput.value = '';
 
-    // --- (EXISTENTE) Indicador de Carregamento "..." ---
     const loadingMessage = displayMessage('', 'bot loading');
-    // --- FIM ---
 
     try {
         const botResponse = await processUserMessage(userMessage);
-
-        // (EXISTENTE) Remove o "..." e mostra a resposta
         loadingMessage.remove();
         displayMessage(botResponse, 'bot');
-
     } catch (error) {
-        // (EXISTENTE) Remove o "..." em caso de erro
         loadingMessage.remove();
         displayMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'bot');
         console.error("Erro completo:", error);
@@ -89,13 +80,11 @@ async function handleSubmit(e) {
 
 /**
  * Adiciona uma mensagem à interface do chat
- * (LÓGICA DO LOADING "..." JÁ ESTÁ AQUI)
  */
 function displayMessage(message, sender) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${sender}-message`;
 
-    // (EXISTENTE) Se não for loading, processa o texto
     if (!sender.includes('loading')) {
         message = message.replace(/\n/g, '<br>');
         messageElement.innerHTML = `<p>${message}</p>`;
@@ -109,68 +98,64 @@ function displayMessage(message, sender) {
 
 /**
 * Interpreta a mensagem do usuário e decide qual ação tomar (GET ou POST).
-* (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
 */
 async function processUserMessage(message) {
     const cleanedMessage = message.trim().replace(/[.!?]$/, '');
     const lowerMessage = cleanedMessage.toLowerCase();
     let match;
 
-    console.log(`DEBUG: processUserMessage v8.0 recebido: "${message}" -> "${cleanedMessage}"`);
+    console.log(`DEBUG: processUserMessage v8.3 (Corrigido) recebido: "${message}"`);
 
-    // --- AÇÕES DE ESCRITA (POST) ---
+    // --- (CORREÇÃO v8.3) ---
+    // Captura o clique no botão "Atualizar Lista" da *sidebar*
+    if (cleanedMessage.includes('🔄 Atualizar Lista')) {
+        console.log("DEBUG v8.3: Acionando Atualização da Sidebar via chat command.");
+
+        // 1. Atualiza a lista da *sidebar*
+        await fetchReposicoes();
+
+        // 2. Retorna a mensagem "Ok..."
+        return "Ok...";
+    }
+    // --- (FIM DA CORREÇÃO) ---
 
     // 1. ADICIONAR ALUNO
     match = cleanedMessage.match(/(adicionar|cadastrar|novo)\s+alun(a|o)?\s*\[?(.*?)\]?\s*(?:no )?curso\s*\[?(.*?)\]?\s*(?:com |em |no )?inicio( em)?\s*\[?(\d{2}\/\d{2}\/\d{4})\]?/i);
     if (match) {
-        // Grupos: 1(verbo), 2(a/o), 3(NOME), 4(CURSO), 5(em), 6(DATA)
-        const [, , , nome_raw, curso_raw, , data_raw] = match; // CORRETO: Índices 3, 4, 6
-
+        const [, , , nome_raw, curso_raw, , data_raw] = match;
         const nome = nome_raw ? nome_raw.trim() : '';
         const curso = curso_raw ? curso_raw.trim() : '';
         const dataInicio = data_raw ? data_raw.trim() : '';
-
         if (!nome || !curso || !dataInicio) {
-            console.error("DEBUG v8.0: Match 'adicionar' falhou em capturar dados.", { nome, curso, dataInicio });
             return "Comando 'adicionar' incompleto. Use: Adicionar aluno [Nome] no curso [Curso] com inicio [dd/mm/aaaa]";
         }
         const dataToSend = { action: 'adicionar', nome, curso, dataInicio };
-        console.log("DEBUG v8.0: Acionando Ação 1 (Adicionar). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
     // 2. ADICIONAR OBSERVAÇÃO
     match = cleanedMessage.match(/(adicionar|nova)\s+(observação|obs|anotação)\s+\[?(.+?)\]?\s+(?:para|d[oa]|n[oa])\s*(?:[oa]\s+)?alun(?:a|o)?\s+\[?(.+?)\]?$/i);
     if (match) {
-        console.log("DEBUG v8.0: Regex de Observação BATEU!");
-        const [, , , obs_raw, nome_raw] = match; // Índices: 3, 4
+        const [, , , obs_raw, nome_raw] = match;
         const obs = obs_raw ? obs_raw.trim() : '';
         const nome = nome_raw ? nome_raw.trim() : '';
-
         if (!obs || !nome) {
-            console.error("DEBUG v8.0: Match 'atualizar_obs' falhou em capturar dados.", { obs, nome });
             return "Comando 'observação' incompleto. Use: Adicionar observação [Texto] para o aluno [Nome]";
         }
         const dataToSend = { action: 'atualizar_obs', nome, obs };
-        console.log("DEBUG v8.0: Acionando Ação 2 (Observação). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
     // 3. ATUALIZAR DATA
     match = cleanedMessage.match(/(atualizar|mudar)\s+data\s+d(?:o|a)\s+alun(?:a|o)?\s+\[?(.*?)\]?\s+para\s+\[?(\d{2}\/\d{2}\/\d{4})\]?/i);
     if (match) {
-        console.log("DEBUG v8.0: Regex de Atualizar Data BATEU!");
-        // Grupos: 1(verbo), 2(NOME), 3(DATA)
-        const [, , nome_raw, novaData_raw] = match; // CORRETO: Índices 2, 3
+        const [, , nome_raw, novaData_raw] = match;
         const nome = nome_raw ? nome_raw.trim() : '';
         const novaData = novaData_raw ? novaData_raw.trim() : '';
-
         if (!nome || !novaData) {
-            console.error("DEBUG v8.0: Match 'atualizar_data' falhou em capturar dados.", { nome, novaData });
             return "Comando 'atualizar data' incompleto. Use: Atualizar data do aluno [Nome] para [dd/mm/aaaa]";
         }
         const dataToSend = { action: 'atualizar_data', nome, novaData };
-        console.log("DEBUG v8.0: Acionando Ação 3 (Atualizar Data). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
@@ -180,23 +165,17 @@ async function processUserMessage(message) {
         let nome = match[2].trim();
         nome = nome.replace(/^\[|\]$/g, '').trim();
         if (!nome) {
-            console.error("DEBUG v8.0: Match 'remover' falhou em capturar nome.");
-
             return "Comando 'remover' incompleto. Use: Remover aluno [Nome]";
         }
         const dataToSend = { action: 'remover', nome: nome };
-        console.log("DEBUG v8.0: Acionando Ação 4 (Remover). Enviando:", dataToSend);
         return await sendDataToAPI(dataToSend);
     }
 
     // --- CONSULTAR LOGINS DA TURMA ATUAL ---
     match = lowerMessage.match(/(quais|me de|me da|os)\s+(logins?|senhas?)\s+(d[ao]s?\s+)?(alunos?\s+)?(de\s+)?(agora|hoje|atuais?)/i);
     if (match) {
-        console.log("DEBUG v8.0: Acionando Consulta de Logins da Turma Atual.");
         return await getDataFromAPI('logins_agora', {}, 'logins_agora');
     }
-
-    console.log("DEBUG v8.0: Nenhuma Ação (POST) bateu. Verificando Consultas (GET)...");
 
     // --- AÇÕES DE CONSULTA (GET) ---
 
@@ -204,7 +183,6 @@ async function processUserMessage(message) {
     match = lowerMessage.match(/(?:no dia|para a data de)\s+(\d{2}\/\d{2}\/\d{4})/);
     if (match) {
         const dataBusca = match[1];
-        console.log("DEBUG v8.0: Acionando Consulta 5 (Data Específica). Data:", dataBusca);
         return await getDataFromAPI('data_especifica', { data: dataBusca });
     }
 
@@ -212,39 +190,33 @@ async function processUserMessage(message) {
     match = lowerMessage.match(/próximos\s+(\d+)\s+dias/);
     if (match) {
         const dias = match[1];
-        console.log("DEBUG v8.0: Acionando Consulta 6 (Próximos Dias). Dias:", dias);
         return await getDataFromAPI('proximos_dias', { dias: dias });
     }
 
     // 7. CONSULTA: ESSA SEMANA
     if (lowerMessage.includes('essa semana') || lowerMessage.includes('esta semana') || lowerMessage.includes('nos próximos 7 dias')) {
-        console.log("DEBUG v8.0: Acionando Consulta 7 (Semana).");
         return await getDataFromAPI('semana');
     }
 
     // 8. CONSULTA: MÊS QUE VEM
     if (lowerMessage.includes('mês que vem') || lowerMessage.includes('proximo mes')) {
-        console.log("DEBUG v8.0: Acionando Consulta 8 (Mês Que Vem).");
         return await getDataFromAPI('mes_que_vem');
     }
 
     // 9. CONSULTA: ANO QUE VEM
     if (lowerMessage.includes('ano que vem') || lowerMessage.includes('proximo ano')) {
-        console.log("DEBUG v8.0: Acionando Consulta 9 (Ano Que Vem).");
         return await getDataFromAPI('ano_que_vem');
     }
 
     // 10. CONSULTA: MÊS ESPECÍFICO
     match = lowerMessage.match(/em\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)/i);
-    if (match) {
+   if (match) {
         const mes = match[1];
-        console.log("DEBUG v8.0: Acionando Consulta 10 (Mês Específico). Mês:", mes);
         return await getDataFromAPI('mes', { mes: mes });
     }
 
     // 11. CONSULTA: ATRASADO
     if (lowerMessage.includes('atrasado') || lowerMessage.includes('vencido') || lowerMessage.includes('fora do prazo')) {
-        console.log("DEBUG v8.0: Acionando Consulta 11 (Atrasado).");
         return await getDataFromAPI('atrasado');
     }
 
@@ -253,7 +225,6 @@ async function processUserMessage(message) {
     if (match) {
         const anoBusca = match[1];
         if (anoBusca && parseInt(anoBusca) > 2000 && parseInt(anoBusca) < 2100) {
-            console.log("DEBUG v8.0: Acionando Consulta 12 (Ano Conclusão). Ano:", anoBusca);
             return await getDataFromAPI('ano_conclusao', { ano: anoBusca });
         }
     }
@@ -275,141 +246,107 @@ async function processUserMessage(message) {
                 'excluir', 'deletar', 'cadastrar', 'novo', 'mudar', 'observação', 'obs',
                 'anotação', 'próximos', 'proximo', 'ano', 'data', 'inicio', 'curso',
                 'para', 'com', 'quem', 'qual', 'quais', 'em', 'no', 'do', 'da', 'a', 'o',
-                'logins', 'senhas', 'agora', 'hoje'
+                'logins', 'senhas', 'agora', 'hoje', 'atualizar lista'
             ];
-            const isStopWord = stopWords.includes(nomeBusca.toLowerCase());
+            const isStopWord = stopWords.some(word => nomeBusca.toLowerCase().includes(word));
             const hasNumbersOrSlash = /[\d\/]/.test(nomeBusca);
             if (!isStopWord && !hasNumbersOrSlash && nomeBusca.length > 1) {
-                console.log("DEBUG v8.0: Acionando Consulta 13 (Nome Aluno). Nome:", nomeBusca);
                 return await getDataFromAPI('nome_aluno', { nome: nomeBusca });
-            } else {
-                console.log("DEBUG v8.0: Possível match de nome (", nomeBusca, ") ignorado.");
             }
         }
     }
 
     // Se NENHUM comando for reconhecido
-    console.log("DEBUG v8.0: Nenhum comando reconhecido.");
     return "Desculpe, não entendi o comando. Tente os exemplos ao lado.";
 }
 
 
 /**
- * Função para ENVIAR dados (POST) para o Google Apps Script
- * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
+ * Função para ENVIAR dados (POST)
  */
 async function sendDataToAPI(data) {
-    console.log("DEBUG: sendDataToAPI chamado com:", data);
-
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
     }
-
     const response = await fetch(API_URL, {
         method: 'POST',
         mode: 'cors',
-        headers: {
-            'Content-Type': 'text/plain',
-        },
+        headers: { 'Content-Type': 'text/plain', },
         body: JSON.stringify(data),
         redirect: 'follow'
     });
-
     const responseText = await response.text();
-    console.log("DEBUG: Resposta crua da API (POST):", responseText);
-
     if (!response.ok) {
-        console.error(`Erro HTTP ${response.status} da API (POST). Resposta: ${responseText}`);
-        if (responseText.includes("SyntaxError") || responseText.includes("Error:")) {
-            throw new Error(`Erro no script da API (verificar logs do Google): ${responseText.substring(0, 150)}...`);
-        }
-        throw new Error(`Erro de rede ou servidor (${response.status}) ao contactar a API.`);
+        throw new Error(`Erro da API (POST): ${responseText}`);
     }
-
     try {
         const result = JSON.parse(responseText);
-        console.log("DEBUG: Resposta parseada da API (POST):", result);
         if (result.status === 'success') {
             return result.message;
         } else {
-            throw new Error(result.message || "A API retornou um erro sem mensagem específica.");
+            throw new Error(result.message || "A API retornou um erro.");
         }
     } catch (parseError) {
-        console.error("Erro ao parsear JSON da API (POST):", parseError);
-        throw new Error(`A API (POST) retornou uma resposta inesperada (não JSON): ${responseText.substring(0, 100)}... Verifique os logs do Google Apps Script.`);
+        throw new Error(`Resposta inesperada da API (POST): ${responseText}`);
     }
 }
 
 
 /**
- * Função para BUSCAR dados (GET) do Google Apps Script
- * (SEU CÓDIGO ORIGINAL - SEM MUDANÇAS)
+ * Função para BUSCAR dados (GET)
  */
 async function getDataFromAPI(filtro, params = {}, action = 'consultar') {
     if (typeof API_URL === 'undefined') {
         throw new Error("API_URL não está definida. Verifique seu arquivo HTML.");
     }
-
     const url = new URL(API_URL);
     url.searchParams.append('action', action);
     url.searchParams.append('filtro', filtro);
     for (const key in params) {
         url.searchParams.append(key, params[key]);
     }
-    console.log(`DEBUG: getDataFromAPI chamando URL: ${url.toString()}`);
-
     const response = await fetch(url, {
         method: 'GET',
         mode: 'cors',
     });
-
     const responseText = await response.text();
-    console.log("DEBUG: Resposta crua da API (GET):", responseText);
-
     if (!response.ok) {
-        console.error(`Erro HTTP ${response.status} da API (GET). Resposta: ${responseText}`);
-        if (responseText.includes("SyntaxError") || responseText.includes("Error:")) {
-            throw new Error(`Erro no script da API (GET) (verificar logs do Google): ${responseText.substring(0, 150)}...`);
-        }
-        throw new Error(`Erro de rede ou servidor (${response.status}) ao contactar a API (GET).`);
+        throw new Error(`Erro da API (GET): ${responseText}`);
     }
-
     try {
         const result = JSON.parse(responseText);
-        console.log("DEBUG: Resposta parseada da API (GET):", result);
         if (result.status === 'success') {
             return result.data;
         } else {
-            throw new Error(result.message || "A API (GET) retornou um erro sem mensagem.");
+            throw new Error(result.message || "A API (GET) retornou um erro.");
         }
     } catch (parseError) {
-        console.error("Erro ao parsear JSON da API (GET):", parseError);
-        throw new Error(`A API (GET) retornou uma resposta inesperada (não JSON): ${responseText.substring(0, 100)}... Verifique os logs do Google Apps Script.`);
+        throw new Error(`Resposta inesperada da API (GET): ${responseText}`);
     }
 }
 
+// ==========================================================
+// --- (INÍCIO) LÓGICA DE REPOSIÇÃO (v8.3 - Tela Cheia) ---
+// ==========================================================
+
 /**
-* (NOVO v8.2) Busca a lista e MOSTRA O CURSO
+* (v8.2) Busca a lista de alunos para a *SIDEBAR*
 */
 async function fetchReposicoes() {
-    console.log("DEBUG v8.2: Buscando lista de reposição...");
+    console.log("DEBUG v8.2: Buscando lista de reposição (Sidebar)...");
     reposicaoLoading.style.display = 'block';
 
-    // 1. Limpa a lista antiga
     const oldItems = reposicaoListContainer.querySelectorAll('.reposicao-item');
     oldItems.forEach(item => item.remove());
     const noStudentsMessage = reposicaoListContainer.querySelector('.reposicao-vazio');
     if (noStudentsMessage) noStudentsMessage.remove();
 
     try {
-        // 3. Chama a ação (ela agora retorna {nome, curso, faltas})
+        // Esta chamada DEVE retornar {nome, curso, faltas}
         const alunos = await getDataFromAPI('consultar_reposicoes', {}, 'consultar_reposicoes');
-
         reposicaoLoading.style.display = 'none';
 
         if (!alunos || alunos.length === 0) {
-            // ... (código da mensagem "Nenhum aluno" - sem mudanças) ...
-            console.log("DEBUG v8.2: Nenhum aluno para reposição.");
             const li = document.createElement('li');
             li.className = 'reposicao-vazio';
             li.style.color = "#888";
@@ -420,120 +357,199 @@ async function fetchReposicoes() {
             return;
         }
 
-        console.log(`DEBUG v8.2: Recebidos ${alunos.length} registros de reposição.`);
+        console.log(`DEBUG v8.2: Recebidos ${alunos.length} registros para sidebar.`);
 
-        // 4. Cria os <li> para cada aluno/curso
         alunos.forEach(aluno => {
             const li = document.createElement('li');
             li.className = 'reposicao-item';
-
             const nomeSpan = document.createElement('span');
             nomeSpan.className = 'reposicao-nome';
 
-            // --- (MUDANÇA AQUI) ---
-            // Agora mostra NOME - CURSO (FALTAS)
-            const displayText = `${aluno.nome} - ${aluno.curso} (${aluno.faltas} faltas)`;
+            // Verifica se 'aluno.curso' existe (corrige 'undefined')
+            const displayText = (aluno.curso)
+                ? `${aluno.nome} - ${aluno.curso} (${aluno.faltas} faltas)`
+                : `${aluno.nome} (${aluno.faltas} faltas)`; // Fallback
+
             nomeSpan.textContent = displayText;
-            nomeSpan.title = displayText; // Tooltip
-            // --- (FIM DA MUDANÇA) ---
+            nomeSpan.title = displayText;
 
             const botoesDiv = document.createElement('div');
             botoesDiv.className = 'reposicao-botoes';
 
-            // Botão Marcar (Verde)
             const btnMarcar = document.createElement('button');
             btnMarcar.className = 'repo-btn repo-marcar';
             btnMarcar.textContent = 'Marcar';
-            btnMarcar.dataset.nome = aluno.nome; // Guarda o nome
-            btnMarcar.dataset.curso = aluno.curso; // <<< GUARDA O CURSO
+            btnMarcar.dataset.nome = aluno.nome;
+            btnMarcar.dataset.curso = aluno.curso || ''; // Envia curso ou string vazia
 
-            // Botão Remover (Vermelho)
             const btnRemover = document.createElement('button');
             btnRemover.className = 'repo-btn repo-remover';
             btnRemover.textContent = 'Remover';
-            btnRemover.dataset.nome = aluno.nome; // Guarda o nome
-            btnRemover.dataset.curso = aluno.curso; // <<< GUARDA O CURSO
+            btnRemover.dataset.nome = aluno.nome;
+            btnRemover.dataset.curso = aluno.curso || '';
 
             botoesDiv.appendChild(btnMarcar);
             botoesDiv.appendChild(btnRemover);
-
             li.appendChild(nomeSpan);
             li.appendChild(botoesDiv);
-
             reposicaoListContainer.appendChild(li);
         });
-
     } catch (error) {
-        console.error("Erro ao buscar reposições:", error);
+        console.error("Erro ao buscar reposições (Sidebar):", error);
         reposicaoLoading.style.display = 'none';
         displayMessage(`Erro ao carregar lista de reposição: ${error.message}`, 'bot');
     }
 }
 
 /**
-* (NOVO v8.2) Lida com cliques, ENVIANDO NOME + CURSO
+* (v8.3) Lida com cliques nos botões 'Marcar'/'Remover'
+* (Funciona para AMBAS as listas, sidebar e página)
 */
 async function handleReposicaoClick(e) {
     const targetButton = e.target.closest('.repo-btn');
     if (!targetButton) return;
 
-    // --- (MUDANÇA AQUI) ---
     const nomeAluno = targetButton.dataset.nome;
-    const cursoAluno = targetButton.dataset.curso; // <<< LÊ O CURSO
+    const cursoAluno = targetButton.dataset.curso;
 
-    if (!nomeAluno || !cursoAluno) { // <<< CHECA OS DOIS
-        console.error("Botão de reposição clicado, mas 'data-nome' ou 'data-curso' não encontrado.");
+    // Validação crucial para o backend v8.0+
+    if (!nomeAluno || !cursoAluno) {
+        console.error("Botão de reposição clicado, mas 'data-nome' ou 'data-curso' está faltando/undefined.", targetButton.dataset);
+        displayMessage("Erro: Não foi possível identificar o curso do aluno. Verifique o backend (Codigo.gs) e reimplante.", 'bot');
         return;
     }
-    // --- (FIM DA MUDANÇA) ---
 
-    console.log(`DEBUG v8.2: Botão de reposição clicado para: ${nomeAluno} (Curso: ${cursoAluno})`);
+    console.log(`DEBUG v8.3: Botão clicado para: ${nomeAluno} (Curso: ${cursoAluno})`);
 
     const confirmou = confirm(`Tem certeza que deseja marcar a reposição para ${nomeAluno} (Curso: ${cursoAluno})?\n\nIsso irá ZERAR as faltas registradas para este aluno NESTE CURSO.`);
-
-    if (!confirmou) {
-        console.log("DEBUG v8.2: Ação de reposição cancelada.");
-        return;
-    }
+    if (!confirmou) return;
 
     const loadingMessage = displayMessage('', 'bot loading');
 
     try {
-        // --- (MUDANÇA AQUI) ---
-        // Envia nome E curso para o backend
         const dataToSend = { action: 'marcar_reposicao', nome: nomeAluno, curso: cursoAluno };
-        // --- (FIM DA MUDANÇA) ---
-
         const responseMessage = await sendDataToAPI(dataToSend);
 
         loadingMessage.remove();
         displayMessage(responseMessage, 'bot');
 
-        // Atualiza a lista da sidebar (automaticamente)
-        await fetchReposicoes();
+        // ATUALIZA AMBAS AS LISTAS
+        await fetchReposicoes(); // Atualiza a sidebar
+        await refreshReposicaoPageList(); // Atualiza a página cheia
 
     } catch (error) {
         loadingMessage.remove();
         displayMessage(`Erro ao marcar reposição: ${error.message}`, 'bot');
-        console.error("Erro completo (marcar_reposicao):", error);
     }
 }
 
 /**
-* (NOVO v8.1) Inicia os listeners da aplicação
+* (v8.3) Abre a página de reposição em tela cheia
+*/
+async function openReposicaoPage() {
+    console.log("DEBUG v8.3: Abrindo página de reposição...");
+    reposicaoPage.classList.add('is-open');
+    closeMenu(); // Fecha o menu lateral
+    await refreshReposicaoPageList(); // Atualiza a lista ao abrir
+}
+
+/**
+* (v8.3) Fecha a página de reposição
+*/
+function closeReposicaoPage() {
+    console.log("DEBUG v8.3: Fechando página de reposição...");
+    reposicaoPage.classList.remove('is-open');
+}
+
+/**
+* (v8.3) Busca dados e constrói a LISTA DA PÁGINA de reposição
+*/
+async function refreshReposicaoPageList() {
+    console.log("DEBUG v8.3: Atualizando lista da PÁGINA de reposição...");
+    reposicaoPageList.innerHTML = '<li class="reposicao-page-loading">Carregando alunos...</li>';
+
+    try {
+        // Esta chamada DEVE retornar {nome, curso, faltas}
+        const alunos = await getDataFromAPI('consultar_reposicoes', {}, 'consultar_reposicoes');
+
+        if (!alunos || alunos.length === 0) {
+            reposicaoPageList.innerHTML = '<li class="reposicao-page-vazio">Nenhum aluno com 1+ falta.</li>';
+            return;
+        }
+
+        reposicaoPageList.innerHTML = ''; // Limpa o loading
+
+        alunos.forEach(aluno => {
+            const li = document.createElement('li');
+            li.className = 'reposicao-item';
+            const nomeSpan = document.createElement('span');
+            nomeSpan.className = 'reposicao-nome';
+
+            // Verifica se 'aluno.curso' existe (corrige 'undefined')
+            const displayText = (aluno.curso)
+                ? `${aluno.nome} - ${aluno.curso} (${aluno.faltas} faltas)`
+                : `${aluno.nome} (${aluno.faltas} faltas)`; // Fallback
+
+            nomeSpan.textContent = displayText;
+            nomeSpan.title = displayText;
+
+            const botoesDiv = document.createElement('div');
+            botoesDiv.className = 'reposicao-botoes';
+
+            const btnMarcar = document.createElement('button');
+            btnMarcar.className = 'repo-btn repo-marcar';
+            btnMarcar.textContent = 'Marcar';
+            btnMarcar.dataset.nome = aluno.nome;
+            btnMarcar.dataset.curso = aluno.curso || '';
+
+            const btnRemover = document.createElement('button');
+            btnRemover.className = 'repo-btn repo-remover';
+            btnRemover.textContent = 'Remover';
+             btnRemover.dataset.nome = aluno.nome;
+            btnRemover.dataset.curso = aluno.curso || '';
+
+            botoesDiv.appendChild(btnMarcar);
+            botoesDiv.appendChild(btnRemover);
+            li.appendChild(nomeSpan);
+            li.appendChild(botoesDiv);
+            reposicaoPageList.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar reposições (Página):", error);
+        reposicaoPageList.innerHTML = `<li class="reposicao-page-vazio" style="color: #F44336;">Erro ao carregar lista: ${error.message}</li>`;
+    }
+}
+
+// ==========================================================
+// --- (FIM) LÓGICA DE REPOSIÇÃO (v8.3) ---
+// ==========================================================
+
+
+/**
+* (v8.3) Inicia os listeners da aplicação
 */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM carregado. Iniciando app v8.1...");
+    console.log("DOM carregado. Iniciando app v8.3 (Tela Cheia)...");
 
-    // Listener para o botão de atualizar
-    refreshReposicaoBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede o "borbulhamento" do evento
-        fetchReposicoes();
-    });
+    // Listener do botão de refresh (Sidebar)
+    // (Corrigido para não usar stopPropagation desnecessariamente)
+    refreshReposicaoBtn.addEventListener('click', fetchReposicoes);
 
-    // Listener para os botões "Marcar" / "Remover" (usando delegação)
+    // Listener para os botões "Marcar" / "Remover" (Sidebar)
     reposicaoListContainer.addEventListener('click', handleReposicaoClick);
 
-    // Busca a lista de reposição assim que a página carrega
+    // --- Listeners v8.3 ---
+    // Listener para ABRIR a página de reposição
+    manageReposicaoBtn.addEventListener('click', openReposicaoPage);
+
+    // Listener para FECHAR a página de reposição
+    reposicaoPageBackBtn.addEventListener('click', closeReposicaoPage);
+
+    // Listener para os botões "Marcar" / "Remover" (PÁGINA CHEIA)
+    reposicaoPageList.addEventListener('click', handleReposicaoClick);
+    // --- FIM v8.3 ---
+
+    // Busca a lista de reposição da sidebar assim que a página carrega
     fetchReposicoes();
 });
