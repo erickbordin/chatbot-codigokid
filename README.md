@@ -1,81 +1,74 @@
-Here is the **README.md** in English, fully professional and without emojis.
-
-````markdown
 # Assistente Codigo Kid
 
-An intelligent web interface designed to facilitate student, class, and makeup class management for **Codigo Kid**. The system operates as an interactive chatbot that communicates with a database (Google Sheets) via a Google Apps Script API.
+This project is a web-based chatbot interface designed to streamline school management for the Codigo Kid unit. It connects to a Google Sheets database via a Google Apps Script API to manage student data, deadlines, and makeup classes.
 
-## Features
+## Learning Journey
 
-The system offers a chat interface and a sidebar for quick management:
+**I developed this project to solve real-world administrative challenges.**
 
-* [cite_start]**Smart Chatbot:** Natural language command processing for queries and registrations[cite: 1].
-* [cite_start]**Deadline Management:** Quick queries to see who finishes the course this week, next month, or who is currently overdue[cite: 1].
-* **Makeup Class System (v8.3):**
-    * Monitors students with absences.
-    * [cite_start]Dedicated **Full Screen** interface to manage makeup classes[cite: 3].
-    * [cite_start]Quick buttons to "Mark as Done" (reset absences) or "Remove" a student from the list[cite: 1].
-* [cite_start]**Login Lookup:** Rapid view of logins and passwords for the current class[cite: 1].
-* [cite_start]**Responsive Design:** Dark Mode interface adapted for Desktops and Mobile Devices (featuring a drawer sidebar)[cite: 5].
+I built this application to practice and solidify my knowledge in frontend development, specifically focusing on:
+* Asynchronous JavaScript (Async/Await and Fetch API).
+* DOM Manipulation and Event Handling.
+* Regular Expressions (Regex) for natural language processing.
+* Responsive Design (CSS Grid/Flexbox) for mobile and desktop compatibility.
+
+Constructive feedback is highly appreciated as I continue to improve my skills.
 
 ## Technologies Used
 
-* **Frontend:** HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+).
-* [cite_start]**Backend:** Google Apps Script (communication via `fetch` API)[cite: 4].
-* [cite_start]**Style:** Dark Mode theme with custom colors (#9634F9 as primary)[cite: 5].
+This project was built using the following stack:
+
+* **JavaScript (ES6+)**: Handles the chatbot logic, API communication, and UI updates.
+* **HTML5**: Provides the semantic structure for the chat interface and management dashboards.
+* **CSS3**: Custom styling with a dark theme, including animations and responsive layouts.
+* **Google Apps Script**: Serves as the backend API to interact with Google Sheets.
 
 ## How to Run
 
-Since this is a static Front-end project that connects to an external API, you can run it on any simple web server or locally.
+Since this is a static frontend project, it does not require a build process. However, you must configure the API connection manually.
 
-### 1. Clone the repository
-```bash
-git clone [https://github.com/YOUR-USERNAME/assistente-codigo-kid.git](https://github.com/YOUR-USERNAME/assistente-codigo-kid.git)
-cd assistente-codigo-kid
-````
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/YOUR-USERNAME/assistente-codigo-kid.git](https://github.com/YOUR-USERNAME/assistente-codigo-kid.git)
+    cd assistente-codigo-kid
+    ```
 
-### 2\. Configure the API
+2.  **Configure the API (Crucial Step):**
+    The `config.js` file is excluded from version control for security reasons. You must create it manually in the root folder.
+    
+    * Create a file named `config.js`.
+    * Add the following code inside it (replace with your actual Google Apps Script URL):
+    
+    ```javascript
+    const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+    ```
 
-[cite_start]The API configuration file (`config.js`) is ignored by Git for security purposes[cite: 2]. You need to manually create it in the project root:
+3.  **Run the application:**
+    Simply open the `index.html` file in your preferred web browser.
 
-1.  Create a file named `config.js`.
-2.  [cite_start]Add the `API_URL` constant with your Google Apps Script Web App link[cite: 4]:
+## Features
 
-<!-- end list -->
-
-```javascript
-// File: config.js
-const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
-```
-
-### 3\. Run
-
-Simply open the `index.html` file in your preferred browser.
-
-## Command Examples
-
-[cite_start]Note: The chatbot interprets commands in **Portuguese**[cite: 1]. [cite_start]You can type these commands in the chat or use the quick buttons in the sidebar[cite: 3].
-
-  * **Queries:**
-      * "Quais os logins de agora?" (What are the logins now?)
-      * "Quem está atrasado?" (Who is overdue?)
-      * "Quem finaliza em janeiro?" (Who finishes in January?)
-      * "Consultar aluno [Name]" (Check student [Name])
-  * **Manual Actions (Typed):**
-      * `Adicionar aluno [Name] no curso [Course] com inicio [dd/mm/yyyy]`
-      * `Adicionar observação [Text] para o aluno [Name]`
-      * `Atualizar data do aluno [Name] para [dd/mm/yyyy]`
+* **Intelligent Chatbot:**
+    * Interprets natural language commands to find student information.
+    * Example commands: "Who is overdue?", "Who finishes in January?", "Check student [Name]".
+* **Makeup Class Management (Full Screen):**
+    * Dedicated interface to view students with absences.
+    * One-click options to "Mark as Done" (reset absences) or "Remove" students.
+* **Deadline Tracking:**
+    * Automated queries to identify students finishing the course in the current week or month.
+* **Login Retrieval:**
+    * Quickly fetch login credentials for the current class.
+* **Responsive Interface:**
+    * Optimized for both desktop monitors and mobile devices (using a drawer sidebar menu).
 
 ## Project Structure
 
-  * [cite_start]`index.html`: Main structure, containing the chat, sidebar, and the full-screen makeup class page[cite: 3].
-  * [cite_start]`style.css`: Complete styling, including loading animations and responsiveness for tablets/mobile phones[cite: 5].
-  * [cite_start]`script.js`: Chatbot logic, Regex processing, DOM manipulation, and API communication[cite: 1].
-  * [cite_start]`config.js`: (Not versioned) Stores the sensitive API URL[cite: 4, 2].
+The project follows a simple structure separating concerns:
 
------
+* `index.html`: The main structure containing the chat container, sidebar, and full-screen overlays.
+* `style.css`: Contains all visual styles, including the dark color palette and loading animations.
+* `script.js`: Contains the core logic, including the regex patterns for command recognition and the `fetch` functions for the API.
+* `config.js`: (Local only) Stores the sensitive API endpoint.
 
-Developed by **Erick Bordin**.
-
-```
-```
+---
+*Developed by Erick Bordin as a portfolio project.*
